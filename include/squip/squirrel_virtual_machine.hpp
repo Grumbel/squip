@@ -23,6 +23,8 @@
 
 #include "squip/squirrel_vm.hpp"
 
+namespace squip {
+
 class SquirrelThreadQueue;
 class SquirrelScheduler;
 
@@ -57,6 +59,8 @@ private:
   SquirrelVirtualMachine(const SquirrelVirtualMachine&) = delete;
   SquirrelVirtualMachine& operator=(const SquirrelVirtualMachine&) = delete;
 };
+
+} // namespace squip
 
 #endif
 

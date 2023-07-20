@@ -32,6 +32,8 @@
 #include "squip/squirrel_util.hpp"
 #include "squip/time.hpp"
 
+namespace squip {
+
 #ifdef ENABLE_SQDBG
 #  include "../../external/squirrel/sqdbg/sqrdbg.h"
 namespace {
@@ -172,5 +174,7 @@ SquirrelVirtualMachine::wakeup_screenswitch()
 {
   m_screenswitch_queue->wakeup();
 }
+
+} // namespace squip
 
 /* EOF */

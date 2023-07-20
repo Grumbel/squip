@@ -19,6 +19,8 @@
 
 #include <squirrel.h>
 
+namespace squip {
+
 /**
  * Objects that want to expose themself to the scripting environment
  * should implement this interface
@@ -32,6 +34,8 @@ public:
   virtual void expose(HSQUIRRELVM vm, SQInteger table_idx) = 0;
   virtual void unexpose(HSQUIRRELVM vm, SQInteger table_idx) = 0;
 };
+
+} // namespace squip
 
 #endif
 

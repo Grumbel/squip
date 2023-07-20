@@ -26,6 +26,8 @@
 #include "squip/log.hpp"
 #include "squip/time.hpp"
 
+namespace squip {
+
 SquirrelEnvironment::SquirrelEnvironment(SquirrelVM& vm, const std::string& name) :
   m_vm(vm),
   m_table(),
@@ -194,5 +196,7 @@ SquirrelEnvironment::update(float dt_sec)
 {
   m_scheduler->update(g_game_time);
 }
+
+} // namespace squip
 
 /* EOF */

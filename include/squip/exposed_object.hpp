@@ -24,6 +24,8 @@
 #include "squip/script_interface.hpp"
 #include "util/log.hpp"
 
+namespace squip {
+
 /**
  * @class ExposedObject
  * This class binds a certain GameObject class to a scripting class.
@@ -101,6 +103,8 @@ private:
   ExposedObject(const ExposedObject&) = delete;
   ExposedObject& operator=(const ExposedObject&) = delete;
 };
+
+} // namespace squip
 
 #endif
 

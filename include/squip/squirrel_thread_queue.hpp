@@ -17,8 +17,11 @@
 #ifndef HEADER_SUPERTUX_SQUIRREL_SQUIRREL_THREAD_QUEUE_HPP
 #define HEADER_SUPERTUX_SQUIRREL_SQUIRREL_THREAD_QUEUE_HPP
 
-#include <squirrel.h>
 #include <vector>
+
+#include <squirrel.h>
+
+namespace squip {
 
 class SquirrelVM;
 
@@ -42,6 +45,8 @@ private:
   SquirrelThreadQueue(const SquirrelThreadQueue&) = delete;
   SquirrelThreadQueue& operator=(const SquirrelThreadQueue&) = delete;
 };
+
+} // namespace squip
 
 #endif
 

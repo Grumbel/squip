@@ -18,6 +18,8 @@
 
 #include <sstream>
 
+namespace squip {
+
 SquirrelError::SquirrelError(HSQUIRRELVM v, const std::string& message_) throw() :
   message()
 {
@@ -46,5 +48,7 @@ SquirrelError::what() const throw()
 {
   return message.c_str();
 }
+
+} // namespace squip
 
 /* EOF */

@@ -25,6 +25,8 @@
 
 #include "squip/script_interface.hpp"
 
+namespace squip {
+
 std::string squirrel2string(HSQUIRRELVM v, SQInteger i)
 {
   std::ostringstream os;
@@ -252,5 +254,7 @@ HSQUIRRELVM object_to_vm(HSQOBJECT object)
 
   return object._unVal.pThread;
 }
+
+} // namespace squip
 
 /* EOF */

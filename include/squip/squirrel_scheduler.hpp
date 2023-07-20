@@ -21,6 +21,8 @@
 
 #include <squirrel.h>
 
+namespace squip {
+
 class SquirrelVM;
 
 /** This class keeps a list of squirrel threads that are scheduled for a certain
@@ -60,6 +62,8 @@ private:
   SquirrelScheduler(const SquirrelScheduler&) = delete;
   SquirrelScheduler& operator=(const SquirrelScheduler&) = delete;
 };
+
+} // namespace squip
 
 #endif
 

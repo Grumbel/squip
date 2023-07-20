@@ -23,6 +23,8 @@
 
 #include <squirrel.h>
 
+namespace squip {
+
 /** Basic wrapper around HSQUIRRELVM with some utility functions, not
     to be confused with SquirrelVirtualMachine. The classes might be
     merged in the future. */
@@ -75,6 +77,8 @@ private:
   SquirrelVM(const SquirrelVM&) = delete;
   SquirrelVM& operator=(const SquirrelVM&) = delete;
 };
+
+} // namespace squip
 
 #endif
 

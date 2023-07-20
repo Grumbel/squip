@@ -21,6 +21,8 @@
 
 #include "squip/log.hpp"
 
+namespace squip {
+
 SquirrelThreadQueue::SquirrelThreadQueue(SquirrelVM& vm) :
   m_vm(vm),
   m_threads()
@@ -69,5 +71,7 @@ SquirrelThreadQueue::wakeup()
     sq_pop(m_vm.get_vm(), 1);
   }
 }
+
+} // namespace squip
 
 /* EOF */

@@ -27,6 +27,8 @@
 #include "squip/squirrel_error.hpp"
 //#include "scripting/wrapper.hpp"
 
+namespace squip {
+
 typedef std::vector<HSQOBJECT> ScriptList;
 
 std::string squirrel2string(HSQUIRRELVM vm, SQInteger i);
@@ -76,6 +78,8 @@ static inline void unexpose_object(HSQUIRRELVM vm, SQInteger table_idx,
   }
 }
 #endif
+
+} // namespace squip
 
 #endif
 

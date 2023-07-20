@@ -25,6 +25,8 @@
 
 #include "squip/squirrel_util.hpp"
 
+namespace squip {
+
 class GameObject;
 class ScriptInterface;
 class SquirrelVM;
@@ -89,6 +91,8 @@ private:
   SquirrelEnvironment(const SquirrelEnvironment&) = delete;
   SquirrelEnvironment& operator=(const SquirrelEnvironment&) = delete;
 };
+
+} // namespace squip
 
 #endif
 

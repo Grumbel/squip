@@ -22,6 +22,8 @@
 #include "squip/squirrel_error.hpp"
 #include "squip/squirrel_util.hpp"
 
+namespace squip {
+
 SquirrelVM::SquirrelVM() :
   m_vm()
 {
@@ -321,5 +323,7 @@ SquirrelVM::create_thread()
 
   return vm_object;
 }
+
+} // namespace squip
 
 /* EOF */

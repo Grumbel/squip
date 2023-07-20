@@ -24,6 +24,8 @@
 #include "util/writer.hpp"
 #endif
 
+namespace squip {
+
 #if 0
 void load_squirrel_table(HSQUIRRELVM vm, SQInteger table_idx, const ReaderMapping& mapping)
 {
@@ -147,5 +149,7 @@ void save_squirrel_table(HSQUIRRELVM vm, SQInteger table_idx, Writer& writer)
   sq_pop(vm, 1);
 }
 #endif
+
+} // namespace squip
 
 /* EOF */

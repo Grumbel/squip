@@ -22,6 +22,8 @@
 #include "squip/squirrel_util.hpp"
 #include "squip/log.hpp"
 
+namespace squip {
+
 SquirrelScheduler::SquirrelScheduler(SquirrelVM& vm) :
   m_vm(vm),
   schedule()
@@ -93,5 +95,7 @@ SquirrelScheduler::schedule_thread(HSQUIRRELVM scheduled_vm, float time, bool sk
   schedule.push_back(entry);
   std::push_heap(schedule.begin(), schedule.end());
 }
+
+} // namespace squip
 
 /* EOF */

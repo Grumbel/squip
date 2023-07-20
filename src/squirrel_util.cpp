@@ -60,6 +60,7 @@ std::string squirrel2string(HSQUIRRELVM v, SQInteger i)
     case OT_STRING: {
       const SQChar* val;
       sq_getstring(v, i, &val);
+      // FIXME: this needs escaping
       os << "\"" << val << "\"";
       break;
     }

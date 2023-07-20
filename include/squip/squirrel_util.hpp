@@ -31,7 +31,9 @@ namespace squip {
 
 typedef std::vector<HSQOBJECT> ScriptList;
 
+/** Pick object from stack position i and convert it to a human readable string */
 std::string squirrel2string(HSQUIRRELVM vm, SQInteger i);
+
 void print_squirrel_stack(HSQUIRRELVM vm);
 
 SQInteger squirrel_read_char(SQUserPointer file);

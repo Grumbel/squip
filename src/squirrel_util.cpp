@@ -14,9 +14,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "squirrel/squirrel_util.hpp"
-
-#include <config.h>
+#include "squip/squirrel_util.hpp"
 
 #include <stdio.h>
 #include <sqstdaux.h>
@@ -25,9 +23,7 @@
 #include <sqstdstring.h>
 #include <stdarg.h>
 
-#include "squirrel/script_interface.hpp"
-#include "supertux/game_object.hpp"
-#include "util/log.hpp"
+#include "squip/script_interface.hpp"
 
 std::string squirrel2string(HSQUIRRELVM v, SQInteger i)
 {

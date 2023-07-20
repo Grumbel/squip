@@ -19,9 +19,9 @@
 
 #include <memory>
 
-#include "squirrel/squirrel_virtual_machine.hpp"
-#include "squirrel/squirrel_util.hpp"
-#include "squirrel/script_interface.hpp"
+#include "squip/squirrel_virtual_machine.hpp"
+#include "squip/squirrel_util.hpp"
+#include "squip/script_interface.hpp"
 #include "util/log.hpp"
 
 /**

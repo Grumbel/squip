@@ -14,25 +14,23 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "squirrel/squirrel_virtual_machine.hpp"
+#include "squip/squirrel_virtual_machine.hpp"
+
+#include <iostream>
+#include <cstring>
+#include <stdarg.h>
+#include <stdio.h>
 
 #include <sqstdaux.h>
 #include <sqstdblob.h>
 #include <sqstdmath.h>
 #include <sqstdstring.h>
-#include <cstring>
-#include <stdarg.h>
-#include <stdio.h>
 
-#include "physfs/ifile_stream.hpp"
-#include "scripting/wrapper.hpp"
-#include "squirrel/squirrel_error.hpp"
-#include "squirrel/squirrel_thread_queue.hpp"
-#include "squirrel/squirrel_scheduler.hpp"
-#include "squirrel_util.hpp"
-#include "supertux/console.hpp"
-#include "supertux/globals.hpp"
-#include "util/log.hpp"
+#include "squip/squirrel_error.hpp"
+#include "squip/squirrel_thread_queue.hpp"
+#include "squip/squirrel_scheduler.hpp"
+#include "squip/squirrel_util.hpp"
+#include "squip/time.hpp"
 
 #ifdef ENABLE_SQDBG
 #  include "../../external/squirrel/sqdbg/sqrdbg.h"
@@ -56,7 +54,7 @@ void printfunc(HSQUIRRELVM, const char* fmt, ...)
   char* ptr = strtok(buf, separator);
   while (ptr != nullptr)
   {
-    ConsoleBuffer::output << "[SCRIPTING] " << ptr << std::endl;
+    std::cout << "[SCRIPTING] " << ptr << std::endl;
     ptr = strtok(nullptr, separator);
   }
   va_end(arglist);
@@ -101,8 +99,10 @@ SquirrelVirtualMachine::SquirrelVirtualMachine(bool enable_debugger) :
   m_vm.delete_table_entry("srand");
   m_vm.delete_table_entry("rand");
 
+#if 0
   // register supertux API
   scripting::register_supertux_wrapper(m_vm.get_vm());
+#endif
 
   sq_pop(m_vm.get_vm(), 1);
 
@@ -111,6 +111,7 @@ SquirrelVirtualMachine::SquirrelVirtualMachine(bool enable_debugger) :
   // register default error handlers
   sqstd_seterrorhandlers(m_vm.get_vm());
 
+#if 0
   // try to load default script
   try {
     std::string filename = "scripts/default.nut";
@@ -119,6 +120,7 @@ SquirrelVirtualMachine::SquirrelVirtualMachine(bool enable_debugger) :
   } catch(std::exception& e) {
     log_warning << "Couldn't load default.nut: " << e.what() << std::endl;
   }
+#endif
 }
 
 SquirrelVirtualMachine::~SquirrelVirtualMachine()

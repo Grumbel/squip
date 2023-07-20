@@ -14,11 +14,12 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "squirrel/squirrel_thread_queue.hpp"
+#include "squip/squirrel_thread_queue.hpp"
 
-#include "squirrel/squirrel_virtual_machine.hpp"
-#include "squirrel/squirrel_util.hpp"
-#include "util/log.hpp"
+#include "squip/squirrel_virtual_machine.hpp"
+#include "squip/squirrel_util.hpp"
+
+#include "squip/log.hpp"
 
 SquirrelThreadQueue::SquirrelThreadQueue(SquirrelVM& vm) :
   m_vm(vm),

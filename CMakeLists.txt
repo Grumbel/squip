@@ -33,7 +33,7 @@ file(GLOB SQUIP_SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
 add_library(squip STATIC
   ${SQUIP_SOURCES}
   )
-target_include_directories(squip INTERFACE
+target_include_directories(squip PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>
   )

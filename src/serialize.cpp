@@ -14,17 +14,17 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "squirrel/serialize.hpp"
+#include "squip/serialize.hpp"
 
 #include <iostream>
-#include <sexp/value.hpp>
-#include <sexp/util.hpp>
 
-#include "squirrel/squirrel_error.hpp"
-#include "util/log.hpp"
+#include "squip/squirrel_error.hpp"
+#if 0
 #include "util/reader_mapping.hpp"
 #include "util/writer.hpp"
+#endif
 
+#if 0
 void load_squirrel_table(HSQUIRRELVM vm, SQInteger table_idx, const ReaderMapping& mapping)
 {
   if (table_idx < 0)
@@ -146,5 +146,6 @@ void save_squirrel_table(HSQUIRRELVM vm, SQInteger table_idx, Writer& writer)
   }
   sq_pop(vm, 1);
 }
+#endif
 
 /* EOF */

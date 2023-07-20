@@ -14,14 +14,13 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "squirrel/squirrel_scheduler.hpp"
+#include "squip/squirrel_scheduler.hpp"
 
 #include <algorithm>
 
-#include "squirrel/squirrel_virtual_machine.hpp"
-#include "squirrel/squirrel_util.hpp"
-#include "supertux/level.hpp"
-#include "util/log.hpp"
+#include "squip/squirrel_virtual_machine.hpp"
+#include "squip/squirrel_util.hpp"
+#include "squip/log.hpp"
 
 SquirrelScheduler::SquirrelScheduler(SquirrelVM& vm) :
   m_vm(vm),
@@ -33,9 +32,13 @@ void
 SquirrelScheduler::update(float time)
 {
   while (!schedule.empty() && (schedule.front().wakeup_time < time ||
-        (schedule.front().skippable &&
+        (schedule.front().skippable
+#if 0
+         &&
         Level::current() != nullptr &&
-        Level::current()->m_skip_cutscene)
+        Level::current()->m_skip_cutscene
+#endif
+          )
       )) {
     HSQOBJECT thread_ref = schedule.front().thread_ref;
 

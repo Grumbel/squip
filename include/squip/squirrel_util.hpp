@@ -23,9 +23,9 @@
 #include <sstream>
 #include <vector>
 
-#include "squirrel/squirrel_virtual_machine.hpp"
-#include "squirrel/squirrel_error.hpp"
-#include "scripting/wrapper.hpp"
+#include "squip/squirrel_virtual_machine.hpp"
+#include "squip/squirrel_error.hpp"
+//#include "scripting/wrapper.hpp"
 
 typedef std::vector<HSQOBJECT> ScriptList;
 
@@ -41,6 +41,7 @@ void compile_script(HSQUIRRELVM vm, std::istream& in,
 void compile_and_run(HSQUIRRELVM vm, std::istream& in,
                      const std::string& sourcename);
 
+#if 0
 template<typename T>
 void expose_object(HSQUIRRELVM vm, SQInteger table_idx,
                    std::unique_ptr<T> object, const std::string& name)
@@ -74,6 +75,7 @@ static inline void unexpose_object(HSQUIRRELVM vm, SQInteger table_idx,
     throw SquirrelError(vm, msg.str());
   }
 }
+#endif
 
 #endif
 

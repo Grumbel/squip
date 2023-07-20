@@ -21,17 +21,16 @@
 
 #include <squirrel.h>
 
-#include "squirrel/squirrel_vm.hpp"
-#include "util/currenton.hpp"
+#include "squip/squirrel_vm.hpp"
 
 class SquirrelThreadQueue;
 class SquirrelScheduler;
 
-class SquirrelVirtualMachine final : public Currenton<SquirrelVirtualMachine>
+class SquirrelVirtualMachine final
 {
 public:
   SquirrelVirtualMachine(bool enable_debugger);
-  ~SquirrelVirtualMachine() override;
+  ~SquirrelVirtualMachine();
 
   SquirrelVM& get_vm() { return m_vm; }
 

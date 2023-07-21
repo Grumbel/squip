@@ -24,6 +24,8 @@
 
 #include <squirrel.h>
 
+#include "squip/squirrel_error.hpp"
+
 namespace squip {
 
 /** Basic wrapper around HSQUIRRELVM with some utility functions, not
@@ -73,6 +75,23 @@ public:
   void delete_table_entry(const char* name);
   void rename_table_entry(const char* oldname, const char* newname);
   std::vector<std::string> get_table_keys();
+
+  template<typename Func>
+  void bind(char const* name, char const* typemask, Func func)
+  {
+    sq_pushroottable(m_vm);
+    sq_pushstring(m_vm, name, -1);
+    sq_newclosure(m_vm, func, 0);
+    sq_setparamscheck(m_vm, SQ_MATCHTYPEMASKSTRING, typemask);
+
+    if(SQ_FAILED(sq_createslot(m_vm, -3))) {
+      throw SquirrelError(m_vm, "Couldn't register function");
+    }
+
+    sq_pop(m_vm, 1);
+  }
+
+  void bind(const char* name, std::function<SQInteger (HSQUIRRELVM)> func);
 
   HSQOBJECT create_thread();
 

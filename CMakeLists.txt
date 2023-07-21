@@ -52,6 +52,21 @@ install(FILES "${CMAKE_CURRENT_BINARY_DIR}/squip.pc"
   DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig"
   )
 
+# build examples
+file(GLOB SQUIP_EXAMPLES_SOURCES examples/*.cpp)
+foreach(SOURCE ${SQUIP_EXAMPLES_SOURCES})
+  get_filename_component(SOURCE_NAME "${SOURCE}" NAME)
+  get_filename_component(SOURCE_NAME_WE ${SOURCE_NAME} NAME_WE)
+  set(TARGET ${SOURCE_NAME_WE})
+
+  add_executable(${TARGET} ${SOURCE})
+  target_compile_options(${TARGET} PRIVATE ${TINYCMMC_WARNINGS_CXX_FLAGS})
+  target_link_libraries(${TARGET}
+    squip
+    squirrel
+    )
+endforeach()
+
 if(BUILD_TESTS)
   enable_testing()
   find_package(GTest REQUIRED)

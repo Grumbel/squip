@@ -30,12 +30,12 @@
 namespace squip {
 
 /** Pick object from stack position i and print it to a human readable string */
-void print(std::ostream& os, HSQUIRRELVM vm, SQInteger idx);
+void print(HSQUIRRELVM vm, SQInteger idx, std::ostream& os);
 
 /** Pick object from stack position i and convert it to a human readable string */
 std::string to_string(HSQUIRRELVM vm, SQInteger idx);
 
-void print_squirrel_stack(HSQUIRRELVM vm);
+void print_stack(HSQUIRRELVM vm, std::ostream& os);
 
 SQInteger squirrel_read_char(SQUserPointer file);
 

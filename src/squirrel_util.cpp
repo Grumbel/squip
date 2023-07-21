@@ -27,7 +27,7 @@
 
 namespace squip {
 
-void print(std::ostream& os, HSQUIRRELVM vm, SQInteger idx)
+void print(HSQUIRRELVM vm, SQInteger idx, std::ostream& os)
 {
   // convert idx to positive, as sq_pushnull() would otherwise invalidate it
   if (idx < 0) {
@@ -37,7 +37,7 @@ void print(std::ostream& os, HSQUIRRELVM vm, SQInteger idx)
   switch (sq_gettype(vm, idx))
   {
     case OT_NULL:
-      os << "<null>";
+      os << "null";
       break;
 
     case OT_BOOL: {
@@ -162,79 +162,20 @@ void print(std::ostream& os, HSQUIRRELVM vm, SQInteger idx)
 std::string to_string(HSQUIRRELVM vm, SQInteger idx)
 {
   std::ostringstream os;
-  print(os, vm, idx);
+  print(vm, idx, os);
   return os.str();
 }
 
-void print_squirrel_stack(HSQUIRRELVM v)
+void print_stack(HSQUIRRELVM vm, std::ostream& os)
 {
-  printf("--------------------------------------------------------------\n");
-  SQInteger count = sq_gettop(v);
-  for (int i = 1; i <= count; ++i) {
-    printf("%d: ",i);
-    switch (sq_gettype(v, i))
-    {
-      case OT_NULL:
-        printf("null");
-        break;
-      case OT_INTEGER: {
-        SQInteger val;
-        sq_getinteger(v, i, &val);
-        printf("integer (%d)", static_cast<int>(val));
-        break;
-      }
-      case OT_FLOAT: {
-        SQFloat val;
-        sq_getfloat(v, i, &val);
-        printf("float (%f)", static_cast<double>(val));
-        break;
-      }
-      case OT_STRING: {
-        const SQChar* val;
-        sq_getstring(v, i, &val);
-        printf("string (%s)", val);
-        break;
-      }
-      case OT_TABLE:
-        printf("table");
-        break;
-      case OT_ARRAY:
-        printf("array");
-        break;
-      case OT_USERDATA:
-        printf("userdata");
-        break;
-      case OT_CLOSURE:
-        printf("closure(function)");
-        break;
-      case OT_NATIVECLOSURE:
-        printf("native closure(C function)");
-        break;
-      case OT_GENERATOR:
-        printf("generator");
-        break;
-      case OT_USERPOINTER:
-        printf("userpointer");
-        break;
-      case OT_THREAD:
-        printf("thread");
-        break;
-      case OT_CLASS:
-        printf("class");
-        break;
-      case OT_INSTANCE:
-        printf("instance");
-        break;
-      case OT_WEAKREF:
-        printf("weakref");
-        break;
-      default:
-        printf("unknown?!?");
-        break;
-    }
-    printf("\n");
+  SQInteger const top = sq_gettop(vm);
+
+  for (int i = 1; i <= top; ++i)
+  {
+    os << i << ": ";
+    print(vm, i, os);
+    os << std::endl;
   }
-  printf("--------------------------------------------------------------\n");
 }
 
 SQInteger squirrel_read_char(SQUserPointer file)

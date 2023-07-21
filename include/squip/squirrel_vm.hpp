@@ -92,7 +92,7 @@ public:
     sq_pop(m_vm, 1);
   }
 
-  void bind(const char* name, std::function<SQInteger (HSQUIRRELVM)> func);
+  void bindpp(const char* name, const char* typemask, std::function<SQInteger (HSQUIRRELVM)> func);
 
   HSQOBJECT create_thread();
 

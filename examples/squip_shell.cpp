@@ -56,6 +56,11 @@ int main(int argc, char** argv) try
     return SQ_OK;
   });
 
+  sqvm.bindpp("dodo", ".", [](HSQUIRRELVM vm) -> SQInteger {
+    std::cout << "dodo!" << std::endl;
+    return SQ_OK;
+  });
+
   sqvm.bind("myprintln", "..", [](HSQUIRRELVM vm) -> SQInteger {
     squip::print(vm, -1, std::cout);
     std::cout << std::endl;

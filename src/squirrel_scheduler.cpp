@@ -26,15 +26,15 @@ namespace squip {
 
 SquirrelScheduler::SquirrelScheduler(SquirrelVM& vm) :
   m_vm(vm),
-  schedule()
+  m_schedule()
 {
 }
 
 void
 SquirrelScheduler::update(float time)
 {
-  while (!schedule.empty() && (schedule.front().wakeup_time < time ||
-        (schedule.front().skippable
+  while (!m_schedule.empty() && (m_schedule.front().wakeup_time < time ||
+        (m_schedule.front().skippable
 #if 0
          &&
         Level::current() != nullptr &&
@@ -42,7 +42,7 @@ SquirrelScheduler::update(float time)
 #endif
           )
       )) {
-    HSQOBJECT thread_ref = schedule.front().thread_ref;
+    HSQOBJECT thread_ref = m_schedule.front().thread_ref;
 
     sq_pushobject(m_vm.get_vm(), thread_ref);
     sq_getweakrefval(m_vm.get_vm(), -1);
@@ -69,8 +69,8 @@ SquirrelScheduler::update(float time)
     sq_release(m_vm.get_vm(), &thread_ref);
     sq_pop(m_vm.get_vm(), 2);
 
-    std::pop_heap(schedule.begin(), schedule.end());
-    schedule.pop_back();
+    std::pop_heap(m_schedule.begin(), m_schedule.end());
+    m_schedule.pop_back();
   }
 }
 
@@ -92,8 +92,8 @@ SquirrelScheduler::schedule_thread(HSQUIRRELVM scheduled_vm, float time, bool sk
   sq_addref(m_vm.get_vm(), & entry.thread_ref);
   sq_pop(m_vm.get_vm(), 2);
 
-  schedule.push_back(entry);
-  std::push_heap(schedule.begin(), schedule.end());
+  m_schedule.push_back(entry);
+  std::push_heap(m_schedule.begin(), m_schedule.end());
 }
 
 } // namespace squip

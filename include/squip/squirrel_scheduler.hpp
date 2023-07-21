@@ -55,8 +55,7 @@ private:
 private:
   SquirrelVM& m_vm;
 
-  typedef std::vector<ScheduleEntry> ScheduleHeap;
-  ScheduleHeap schedule;
+  std::vector<ScheduleEntry> m_schedule;
 
 private:
   SquirrelScheduler(const SquirrelScheduler&) = delete;

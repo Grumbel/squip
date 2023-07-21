@@ -22,7 +22,7 @@
 #include "squip/squirrel_virtual_machine.hpp"
 #include "squip/squirrel_util.hpp"
 #include "squip/script_interface.hpp"
-#include "util/log.hpp"
+#include "squip/log.hpp"
 
 namespace squip {
 

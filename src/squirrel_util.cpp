@@ -27,9 +27,14 @@
 
 namespace squip {
 
-void print(std::ostream& os, HSQUIRRELVM vm, SQInteger i)
+void print(std::ostream& os, HSQUIRRELVM vm, SQInteger idx)
 {
-  switch (sq_gettype(vm, i))
+  // convert idx to positive, as sq_pushnull() would otherwise invalidate it
+  if (idx < 0) {
+    idx = sq_gettop(vm) + idx + 1;
+  }
+
+  switch (sq_gettype(vm, idx))
   {
     case OT_NULL:
       os << "<null>";
@@ -37,7 +42,7 @@ void print(std::ostream& os, HSQUIRRELVM vm, SQInteger i)
 
     case OT_BOOL: {
       SQBool p;
-      if (SQ_SUCCEEDED(sq_getbool(vm, i, &p))) {
+      if (SQ_SUCCEEDED(sq_getbool(vm, idx, &p))) {
         if (p)
           os << "true";
         else
@@ -48,21 +53,21 @@ void print(std::ostream& os, HSQUIRRELVM vm, SQInteger i)
 
     case OT_INTEGER: {
       SQInteger val;
-      sq_getinteger(vm, i, &val);
+      sq_getinteger(vm, idx, &val);
       os << val;
       break;
     }
 
     case OT_FLOAT: {
       SQFloat val;
-      sq_getfloat(vm, i, &val);
+      sq_getfloat(vm, idx, &val);
       os << val;
       break;
     }
 
     case OT_STRING: {
       const SQChar* val;
-      sq_getstring(vm, i, &val);
+      sq_getstring(vm, idx, &val);
       // FIXME: this needs escaping
       os << "\"" << val << "\"";
       break;
@@ -72,7 +77,7 @@ void print(std::ostream& os, HSQUIRRELVM vm, SQInteger i)
       bool first = true;
       os << "{";
       sq_pushnull(vm);  //null iterator
-      while (SQ_SUCCEEDED(sq_next(vm,i-1)))
+      while (SQ_SUCCEEDED(sq_next(vm, idx)))
       {
         if (!first) {
           os << ", ";
@@ -94,7 +99,7 @@ void print(std::ostream& os, HSQUIRRELVM vm, SQInteger i)
       bool first = true;
       os << "[";
       sq_pushnull(vm);  //null iterator
-      while (SQ_SUCCEEDED(sq_next(vm, i - 1)))
+      while (SQ_SUCCEEDED(sq_next(vm, idx)))
       {
         if (!first) {
           os << ", ";

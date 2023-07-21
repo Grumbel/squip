@@ -3,7 +3,7 @@
 
 #include <squip/squip.hpp>
 
-int main(int argc, char** argv)
+int main(int argc, char** argv) try
 {
   squip::SquirrelVM sqvm;
 
@@ -74,6 +74,10 @@ int main(int argc, char** argv)
   }
 
   return EXIT_SUCCESS;
+}
+catch (std::exception const& err) {
+  std::cerr << "error: " << err.what() << std::endl;
+  return EXIT_FAILURE;
 }
 
 /* EOF */

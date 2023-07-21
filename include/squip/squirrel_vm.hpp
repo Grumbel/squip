@@ -18,6 +18,7 @@
 #ifndef HEADER_SUPERTUX_SQUIRREL_SQUIRREL_VM_HPP
 #define HEADER_SUPERTUX_SQUIRREL_SQUIRREL_VM_HPP
 
+#include <functional>
 #include <string>
 #include <vector>
 
@@ -35,6 +36,11 @@ public:
   ~SquirrelVM();
 
   HSQUIRRELVM get_vm() const { return m_vm; }
+
+  void set_printfunc(std::function<void (char const*)> printfunc,
+                     std::function<void (char const*)> errorfunc);
+  void set_compilererrorhandler(std::function<
+                                void (SQChar const*, SQChar const*, SQInteger, SQInteger)> compilererrorhandler);
 
   void begin_table(const char* name);
   void end_table(const char* name);
@@ -71,7 +77,16 @@ public:
   HSQOBJECT create_thread();
 
 private:
+  static void my_printfunc(HSQUIRRELVM vm, const char* fmt, ...);
+  static void my_errorfunc(HSQUIRRELVM vm, const char* fmt, ...);
+  static void my_compilererrorhandler(HSQUIRRELVM vm, SQChar const* desc, SQChar const* source, SQInteger line, SQInteger column);
+
+private:
   HSQUIRRELVM m_vm;
+
+  std::function<void (char const*)> m_printfunc;
+  std::function<void (char const*)> m_errorfunc;
+  std::function<void (SQChar const*, SQChar const*, SQInteger, SQInteger)> m_compilererrorhandler;
 
 private:
   SquirrelVM(const SquirrelVM&) = delete;

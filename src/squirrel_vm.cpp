@@ -17,6 +17,8 @@
 
 #include "squip/squirrel_vm.hpp"
 
+#include <cstdarg>
+#include <cstring>
 #include <stdexcept>
 
 #include "squip/squirrel_error.hpp"
@@ -24,12 +26,78 @@
 
 namespace squip {
 
+#ifdef __clang__
+__attribute__((__format__ (__printf__, 2, 0)))
+#endif
+void
+SquirrelVM::my_printfunc(HSQUIRRELVM vm, const char* fmt, ...)
+{
+  // Squirrel always sends "%s" as format string, so we can ignore
+  // handling it
+  assert(std::strcmp("%s", fmt) == 0);
+
+  va_list args;
+  va_start(args, fmt);
+  char const* text = va_arg(args, char const*);
+
+  SquirrelVM* sqvm = reinterpret_cast<SquirrelVM*>(sq_getforeignptr(vm));
+  assert(sqvm != nullptr);
+
+  if (sqvm->m_printfunc) {
+    sqvm->m_printfunc(text);
+  }
+
+  va_end(args);
+}
+
+#ifdef __clang__
+__attribute__((__format__ (__printf__, 2, 0)))
+#endif
+void
+SquirrelVM::my_errorfunc(HSQUIRRELVM vm, const char* fmt, ...)
+{
+  // Squirrel always sends "%s" as format string, so we can ignore
+  // handling it
+  assert(strcmp("%s", fmt) == 0);
+
+  va_list args;
+  va_start(args, fmt);
+  char const* text = va_arg(args, char const*);
+
+  SquirrelVM* sqvm = reinterpret_cast<SquirrelVM*>(sq_getforeignptr(vm));
+  assert(sqvm != nullptr);
+
+  if (sqvm->m_errorfunc) {
+    sqvm->m_errorfunc(text);
+  }
+
+  va_end(args);
+}
+
+void
+SquirrelVM::my_compilererrorhandler(HSQUIRRELVM vm,
+                                    SQChar const* desc, SQChar const* source, SQInteger line, SQInteger column)
+{
+  SquirrelVM* sqvm = reinterpret_cast<SquirrelVM*>(sq_getforeignptr(vm));
+  assert(sqvm != nullptr);
+
+  if (sqvm->m_compilererrorhandler) {
+    sqvm->m_compilererrorhandler(desc, source, line, column);
+  }
+}
+
 SquirrelVM::SquirrelVM() :
-  m_vm()
+  m_vm(),
+  m_printfunc(),
+  m_errorfunc(),
+  m_compilererrorhandler()
 {
   m_vm = sq_open(64);
-  if (m_vm == nullptr)
+  if (m_vm == nullptr) {
     throw std::runtime_error("Couldn't initialize squirrel vm");
+  }
+
+  sq_setforeignptr(m_vm, this);
 }
 
 SquirrelVM::~SquirrelVM()
@@ -42,6 +110,22 @@ SquirrelVM::~SquirrelVM()
 #endif
 
   sq_close(m_vm);
+}
+
+void
+SquirrelVM::set_printfunc(std::function<void (char const*)> printfunc,
+                          std::function<void (char const*)> errorfunc)
+{
+  m_printfunc = std::move(printfunc);
+  m_errorfunc = std::move(errorfunc);
+  sq_setprintfunc(m_vm, &SquirrelVM::my_printfunc, &SquirrelVM::my_errorfunc);
+}
+
+void
+SquirrelVM::set_compilererrorhandler(std::function<void (SQChar const*, SQChar const*, SQInteger, SQInteger)> compilererrorhandler)
+{
+  m_compilererrorhandler = std::move(compilererrorhandler);
+  sq_setcompilererrorhandler(m_vm, &SquirrelVM::my_compilererrorhandler);
 }
 
 void

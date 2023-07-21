@@ -51,6 +51,12 @@ int main(int argc, char** argv)
     return SQ_OK;
   });
 
+  sqvm.bind("myprintln", "..", [](HSQUIRRELVM vm) -> SQInteger {
+    squip::print(vm, -1, std::cout);
+    std::cout << std::endl;
+    return SQ_OK;
+  });
+
   // should result in nothing
   squip::print_stack(sqvm.get_vm(), std::cerr);
 

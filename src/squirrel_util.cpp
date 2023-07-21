@@ -68,8 +68,25 @@ void print(HSQUIRRELVM vm, SQInteger idx, std::ostream& os)
     case OT_STRING: {
       const SQChar* val;
       sq_getstring(vm, idx, &val);
-      // FIXME: this needs escaping
-      os << "\"" << val << "\"";
+
+      os.put('"');
+      while (*val) {
+        switch (*val) {
+          case '\t': os << "\\t"; break;
+          case '\a': os << "\\a"; break;
+          case '\b': os << "\\b"; break;
+          case '\n': os << "\\n"; break;
+          case '\r': os << "\\r"; break;
+          case '\v': os << "\\v"; break;
+          case '\f': os << "\\f"; break;
+          case '\0': os << "\\0"; break;
+          case '\\': os << "\\\\"; break;
+          case '"': os << "\\\""; break;
+          default: os << *val; break;
+        }
+        val += 1;
+      }
+      os.put('"');
       break;
     }
 
@@ -85,7 +102,7 @@ void print(HSQUIRRELVM vm, SQInteger idx, std::ostream& os)
         first = false;
 
         //here -1 is the value and -2 is the key
-        os << to_string(vm, -2) << " => "
+        os << to_string(vm, -2) << ": "
            << to_string(vm, -1);
 
         sq_pop(vm, 2); //pops key and val before the nex iteration

@@ -29,8 +29,11 @@
 
 namespace squip {
 
+/** Pick object from stack position i and print it to a human readable string */
+void print(std::ostream& os, HSQUIRRELVM vm, SQInteger idx);
+
 /** Pick object from stack position i and convert it to a human readable string */
-std::string squirrel2string(HSQUIRRELVM vm, SQInteger i);
+std::string to_string(HSQUIRRELVM vm, SQInteger idx);
 
 void print_squirrel_stack(HSQUIRRELVM vm);
 

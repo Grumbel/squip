@@ -27,17 +27,17 @@
 
 namespace squip {
 
-std::string squirrel2string(HSQUIRRELVM v, SQInteger i)
+void print(std::ostream& os, HSQUIRRELVM vm, SQInteger i)
 {
-  std::ostringstream os;
-  switch (sq_gettype(v, i))
+  switch (sq_gettype(vm, i))
   {
     case OT_NULL:
       os << "<null>";
       break;
+
     case OT_BOOL: {
       SQBool p;
-      if (SQ_SUCCEEDED(sq_getbool(v, i, &p))) {
+      if (SQ_SUCCEEDED(sq_getbool(vm, i, &p))) {
         if (p)
           os << "true";
         else
@@ -45,30 +45,34 @@ std::string squirrel2string(HSQUIRRELVM v, SQInteger i)
       }
       break;
     }
+
     case OT_INTEGER: {
       SQInteger val;
-      sq_getinteger(v, i, &val);
+      sq_getinteger(vm, i, &val);
       os << val;
       break;
     }
+
     case OT_FLOAT: {
       SQFloat val;
-      sq_getfloat(v, i, &val);
+      sq_getfloat(vm, i, &val);
       os << val;
       break;
     }
+
     case OT_STRING: {
       const SQChar* val;
-      sq_getstring(v, i, &val);
+      sq_getstring(vm, i, &val);
       // FIXME: this needs escaping
       os << "\"" << val << "\"";
       break;
     }
+
     case OT_TABLE: {
       bool first = true;
       os << "{";
-      sq_pushnull(v);  //null iterator
-      while (SQ_SUCCEEDED(sq_next(v,i-1)))
+      sq_pushnull(vm);  //null iterator
+      while (SQ_SUCCEEDED(sq_next(vm,i-1)))
       {
         if (!first) {
           os << ", ";
@@ -76,20 +80,21 @@ std::string squirrel2string(HSQUIRRELVM v, SQInteger i)
         first = false;
 
         //here -1 is the value and -2 is the key
-        os << squirrel2string(v, -2) << " => "
-           << squirrel2string(v, -1);
+        os << to_string(vm, -2) << " => "
+           << to_string(vm, -1);
 
-        sq_pop(v,2); //pops key and val before the nex iteration
+        sq_pop(vm, 2); //pops key and val before the nex iteration
       }
-      sq_pop(v, 1);
+      sq_pop(vm, 1);
       os << "}";
       break;
     }
+
     case OT_ARRAY: {
       bool first = true;
       os << "[";
-      sq_pushnull(v);  //null iterator
-      while (SQ_SUCCEEDED(sq_next(v,i-1)))
+      sq_pushnull(vm);  //null iterator
+      while (SQ_SUCCEEDED(sq_next(vm, i - 1)))
       {
         if (!first) {
           os << ", ";
@@ -98,45 +103,61 @@ std::string squirrel2string(HSQUIRRELVM v, SQInteger i)
 
         //here -1 is the value and -2 is the key
         // we ignore the key, since that is just the index in an array
-        os << squirrel2string(v, -1);
+        os << to_string(vm, -1);
 
-        sq_pop(v,2); //pops key and val before the nex iteration
+        sq_pop(vm, 2); //pops key and val before the nex iteration
       }
-      sq_pop(v, 1);
+      sq_pop(vm, 1);
       os << "]";
       break;
     }
+
     case OT_USERDATA:
       os << "<userdata>";
       break;
+
     case OT_CLOSURE:
       os << "<closure>";
       break;
+
     case OT_NATIVECLOSURE:
       os << "<native closure>";
       break;
+
     case OT_GENERATOR:
       os << "<generator>";
       break;
+
     case OT_USERPOINTER:
       os << "userpointer";
       break;
+
     case OT_THREAD:
       os << "<thread>";
       break;
+
     case OT_CLASS:
       os << "<class>";
       break;
+
     case OT_INSTANCE:
       os << "<instance>";
       break;
+
     case OT_WEAKREF:
       os << "<weakref>";
       break;
+
     default:
       os << "<unknown>";
       break;
   }
+}
+
+std::string to_string(HSQUIRRELVM vm, SQInteger idx)
+{
+  std::ostringstream os;
+  print(os, vm, idx);
   return os.str();
 }
 

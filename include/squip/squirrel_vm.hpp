@@ -81,7 +81,8 @@ public:
   {
     sq_pushroottable(m_vm);
     sq_pushstring(m_vm, name, -1);
-    sq_newclosure(m_vm, func, 0);
+    sq_pushuserpointer(m_vm, this);
+    sq_newclosure(m_vm, func, 1);
     sq_setparamscheck(m_vm, SQ_MATCHTYPEMASKSTRING, typemask);
 
     if(SQ_FAILED(sq_createslot(m_vm, -3))) {

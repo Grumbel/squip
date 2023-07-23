@@ -34,4 +34,42 @@ TEST(SquipSquirrelVM, print)
                squip::SquirrelError);
 }
 
+TEST(SquipSquirrelVM, printfunc)
+{
+  squip::SquirrelVM sqvm;
+
+  std::ostringstream os_out;
+  std::ostringstream os_err;
+  sqvm.set_printfunc(
+    [&os_out](char const* msg){
+      os_out << msg;
+    },
+    [&os_err](char const* msg){
+      os_err << msg;
+    });
+
+  auto pf_test = [](HSQUIRRELVM vm, SQPRINTFUNCTION pf, std::ostringstream& os) {
+    os.str("");
+    pf(vm, "%s", "Testomat");
+    EXPECT_EQ(os.str(), "Testomat");
+
+    os.str("");
+    pf(vm, "%d, %d\n", 123, 456);
+    EXPECT_EQ(os.str(), "123, 456\n");
+
+    for (int j = 0; j < 128; ++j) {
+      std::string longtext;
+      for (int i = 0; i < j; ++i) {
+        longtext += "0123456789abcdef";
+      }
+      os.str("");
+      pf(vm, (longtext + "%d, %d" + longtext).c_str(), 123, 456);
+      EXPECT_EQ(os.str(), longtext + "123, 456" + longtext);
+    }
+  };
+
+  pf_test(sqvm.get_vm(), sq_getprintfunc(sqvm.get_vm()), os_out);
+  pf_test(sqvm.get_vm(), sq_geterrorfunc(sqvm.get_vm()), os_err);
+}
+
 /* EOF */

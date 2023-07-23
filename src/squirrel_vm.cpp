@@ -26,52 +26,77 @@
 
 namespace squip {
 
+namespace {
+
+inline
+char const* format_to_scratchpad(HSQUIRRELVM vm, char const* fmt, va_list args)
+{
+  if (strcmp(fmt, "%s") == 0)
+  {
+    // Squirrel just uses "%s"
+    char const* text = va_arg(args, char const*);
+
+    return text;
+  }
+  else
+  {
+    // only some parts of the Squirrel stdlib need full fmt support
+    size_t len = 1024;
+    SQChar* text = sq_getscratchpad(vm, len);
+
+    // vsnprintf() will invalidate args
+    va_list args2;
+    va_copy(args2, args);
+
+    size_t ret = vsnprintf(text, len, fmt, args);
+    if (ret >= len) {  // buffer to small, resize, try again
+      len = ret + 1;  // one more for trailing '\0'
+      text = sq_getscratchpad(vm, len);
+      ret = vsnprintf(text, len, fmt, args2);
+      va_end(args2);
+      assert(ret < len);
+    }
+
+    return text;
+  }
+}
+
+} // namespace
+
 #ifdef __clang__
 __attribute__((__format__ (__printf__, 2, 0)))
 #endif
 void
-SquirrelVM::my_printfunc(HSQUIRRELVM vm, const char* fmt, ...)
+SquirrelVM::my_printfunc(HSQUIRRELVM vm, char const* fmt, ...)
 {
-  // Squirrel always sends "%s" as format string, so we can ignore
-  // handling it
-  assert(std::strcmp("%s", fmt) == 0);
+  SquirrelVM* const sqvm = reinterpret_cast<SquirrelVM*>(sq_getforeignptr(vm));
 
   va_list args;
   va_start(args, fmt);
-  char const* text = va_arg(args, char const*);
-
-  SquirrelVM* sqvm = reinterpret_cast<SquirrelVM*>(sq_getforeignptr(vm));
-  assert(sqvm != nullptr);
+  char const* text = format_to_scratchpad(vm, fmt, args);
+  va_end(args);
 
   if (sqvm->m_printfunc) {
     sqvm->m_printfunc(text);
   }
-
-  va_end(args);
 }
 
 #ifdef __clang__
 __attribute__((__format__ (__printf__, 2, 0)))
 #endif
 void
-SquirrelVM::my_errorfunc(HSQUIRRELVM vm, const char* fmt, ...)
+SquirrelVM::my_errorfunc(HSQUIRRELVM vm, char const* fmt, ...)
 {
-  // Squirrel always sends "%s" as format string, so we can ignore
-  // handling it
-  assert(strcmp("%s", fmt) == 0);
+  SquirrelVM * const sqvm = reinterpret_cast<SquirrelVM*>(sq_getforeignptr(vm));
 
   va_list args;
   va_start(args, fmt);
-  char const* text = va_arg(args, char const*);
-
-  SquirrelVM* sqvm = reinterpret_cast<SquirrelVM*>(sq_getforeignptr(vm));
-  assert(sqvm != nullptr);
+  char const* text = format_to_scratchpad(vm, fmt, args);
+  va_end(args);
 
   if (sqvm->m_errorfunc) {
     sqvm->m_errorfunc(text);
   }
-
-  va_end(args);
 }
 
 void

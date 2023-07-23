@@ -416,6 +416,21 @@ SquirrelVM::get_table_keys()
 }
 
 void
+SquirrelVM::bind(char const* name, char const* typemask, SQFUNCTION func)
+{
+  sq_pushroottable(m_vm);
+  sq_pushstring(m_vm, name, -1);
+  sq_newclosure(m_vm, func, 0);
+  sq_setparamscheck(m_vm, SQ_MATCHTYPEMASKSTRING, typemask);
+
+  if(SQ_FAILED(sq_createslot(m_vm, -3))) {
+    throw SquirrelError(m_vm, "Couldn't register function");
+  }
+
+  sq_pop(m_vm, 1);
+}
+
+void
 SquirrelVM::bindpp(const char* name, const char* typemask, std::function<SQInteger (HSQUIRRELVM)> func)
 {
   sq_pushroottable(m_vm);

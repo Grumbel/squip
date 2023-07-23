@@ -76,22 +76,7 @@ public:
   void rename_table_entry(const char* oldname, const char* newname);
   std::vector<std::string> get_table_keys();
 
-  template<typename Func>
-  void bind(char const* name, char const* typemask, Func func)
-  {
-    sq_pushroottable(m_vm);
-    sq_pushstring(m_vm, name, -1);
-    sq_pushuserpointer(m_vm, this);
-    sq_newclosure(m_vm, func, 1);
-    sq_setparamscheck(m_vm, SQ_MATCHTYPEMASKSTRING, typemask);
-
-    if(SQ_FAILED(sq_createslot(m_vm, -3))) {
-      throw SquirrelError(m_vm, "Couldn't register function");
-    }
-
-    sq_pop(m_vm, 1);
-  }
-
+  void bind(char const* name, char const* typemask, SQFUNCTION func);
   void bindpp(const char* name, const char* typemask, std::function<SQInteger (HSQUIRRELVM)> func);
 
   HSQOBJECT create_thread();

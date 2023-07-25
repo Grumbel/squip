@@ -111,11 +111,25 @@ SquirrelVM::my_compilererrorhandler(HSQUIRRELVM vm,
   }
 }
 
+SQRESULT
+SquirrelVM::my_errorhandler(HSQUIRRELVM vm)
+{
+  SquirrelVM* sqvm = reinterpret_cast<SquirrelVM*>(sq_getforeignptr(vm));
+  assert(sqvm != nullptr);
+
+  if (sqvm->m_errorhandler) {
+    sqvm->m_errorhandler(vm);
+  }
+
+  return SQ_OK;
+}
+
 SquirrelVM::SquirrelVM() :
   m_vm(),
   m_printfunc(),
   m_errorfunc(),
-  m_compilererrorhandler()
+  m_compilererrorhandler(),
+  m_errorhandler()
 {
   m_vm = sq_open(64);
   if (m_vm == nullptr) {
@@ -151,6 +165,14 @@ SquirrelVM::set_compilererrorhandler(std::function<void (SQChar const*, SQChar c
 {
   m_compilererrorhandler = std::move(compilererrorhandler);
   sq_setcompilererrorhandler(m_vm, &SquirrelVM::my_compilererrorhandler);
+}
+
+void
+SquirrelVM::set_errorhandler(std::function<void (HSQUIRRELVM)> errorhandler)
+{
+  m_errorhandler = errorhandler;
+  sq_newclosure(m_vm, &SquirrelVM::my_errorhandler, 0);
+  sq_seterrorhandler(m_vm);
 }
 
 void

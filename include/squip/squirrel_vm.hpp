@@ -43,6 +43,7 @@ public:
                      std::function<void (char const*)> errorfunc);
   void set_compilererrorhandler(std::function<
                                 void (SQChar const*, SQChar const*, SQInteger, SQInteger)> compilererrorhandler);
+  void set_errorhandler(std::function<void (HSQUIRRELVM)> errorhandler);
 
   void begin_table(const char* name);
   void end_table(const char* name);
@@ -85,6 +86,7 @@ private:
   static void my_printfunc(HSQUIRRELVM vm, const char* fmt, ...);
   static void my_errorfunc(HSQUIRRELVM vm, const char* fmt, ...);
   static void my_compilererrorhandler(HSQUIRRELVM vm, SQChar const* desc, SQChar const* source, SQInteger line, SQInteger column);
+  static SQRESULT my_errorhandler(HSQUIRRELVM vm);
 
 private:
   HSQUIRRELVM m_vm;
@@ -92,6 +94,7 @@ private:
   std::function<void (char const*)> m_printfunc;
   std::function<void (char const*)> m_errorfunc;
   std::function<void (SQChar const*, SQChar const*, SQInteger, SQInteger)> m_compilererrorhandler;
+  std::function<void (HSQUIRRELVM)> m_errorhandler;
 
 private:
   SquirrelVM(const SquirrelVM&) = delete;

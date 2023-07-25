@@ -4,6 +4,7 @@
 , cmake
 , gtest
 , squirrel
+, fmt
 , tinycmmc
 , tinycmmc_lib
 }:
@@ -38,6 +39,7 @@ stdenv.mkDerivation {
   buildInputs = [
     tinycmmc
     squirrel
+    fmt
   ];
 
   checkInputs = [

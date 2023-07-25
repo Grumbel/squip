@@ -27,6 +27,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 find_package(squirrel 3.2 REQUIRED)
+find_package(fmt REQUIRED)
 
 file(GLOB SQUIP_HEADERS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
   include/squip/*.hpp)
@@ -67,7 +68,9 @@ foreach(SOURCE ${SQUIP_EXAMPLES_SOURCES})
   target_compile_options(${TARGET} PRIVATE ${TINYCMMC_WARNINGS_CXX_FLAGS})
   target_link_libraries(${TARGET}
     squip
-    squirrel
+    fmt::fmt
+    squirrel::squirrel
+    squirrel::sqstdlib
     )
 endforeach()
 
@@ -83,7 +86,8 @@ if(BUILD_TESTS)
     GTest::GTest
     GTest::Main
     squip
-    squirrel
+    fmt::fmt
+    squirrel::squirrel
     )
 
   add_test(NAME test_squip

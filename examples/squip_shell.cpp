@@ -1,10 +1,72 @@
-#include <stdexcept>
+#include <cstring>
+#include <fstream>
 #include <iostream>
+#include <stdexcept>
+#include <string>
+#include <vector>
+
+#include <fmt/format.h>
+#include <squirrel.h>
+#include <sqstdaux.h>
 
 #include <squip/squip.hpp>
 
+namespace {
+
+struct Options
+{
+  bool debug = false;
+  std::vector<std::string> files = {};
+  std::vector<std::string> rest = {};
+};
+
+Options parse_args(int argc, char** argv)
+{
+  Options opts;
+  for (int i = 1; i < argc; ++i)
+  {
+    if (argv[i][0] == '-')
+    {
+      if (strcmp(argv[i], "-f") == 0 ||
+          strcmp(argv[i], "--file") == 0)
+      {
+        i += 1;
+        if (i >= argc) {
+          throw std::runtime_error(fmt::format("'{}' requires an argument", argv[i - 1]));
+        }
+
+        opts.files.emplace_back(argv[i]);
+      }
+      else if (strcmp(argv[i], "-d") == 0 ||
+               strcmp(argv[i], "--debug") == 0)
+      {
+        opts.debug = true;
+      }
+      else if (strcmp(argv[i], "-D") == 0 ||
+               strcmp(argv[i], "--no-debug") == 0)
+      {
+        opts.debug = false;
+      }
+      else
+      {
+        throw std::runtime_error(fmt::format("unknown option: '{}'", argv[i]));
+      }
+    }
+    else // rest arguments
+    {
+      opts.rest.emplace_back(argv[i]);
+    }
+  }
+
+  return opts;
+}
+
+} // namespace
+
 int main(int argc, char** argv) try
 {
+  Options const opts = parse_args(argc, argv);
+
   squip::SquirrelVM sqvm;
 
   sqvm.set_printfunc(
@@ -70,9 +132,17 @@ int main(int argc, char** argv) try
   // should result in nothing
   squip::print_stack(sqvm.get_vm(), std::cerr);
 
-  for (int i = 1; i < argc; ++i)
-  {
-    std::istringstream is(argv[i]);
+  for (auto const& filename : opts.files) {
+    std::ifstream fin(filename);
+    if (!fin) {
+      throw std::runtime_error(fmt::format("failed to load: {}", filename));
+    }
+
+    squip::compile_and_run(sqvm.get_vm(), fin, filename);
+  }
+
+  for (auto const& text : opts.rest) {
+    std::istringstream is(text);
     squip::compile_and_run(sqvm.get_vm(), is, "<source>");
   }
 

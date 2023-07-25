@@ -36,6 +36,7 @@ void print(HSQUIRRELVM vm, SQInteger idx, std::ostream& os);
 std::string to_string(HSQUIRRELVM vm, SQInteger idx);
 
 void print_stack(HSQUIRRELVM vm, std::ostream& os);
+void print_stacktrace(HSQUIRRELVM vm, std::ostream& os);
 
 SQInteger squirrel_read_char(SQUserPointer file);
 

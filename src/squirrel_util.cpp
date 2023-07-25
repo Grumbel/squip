@@ -16,6 +16,7 @@
 
 #include "squip/squirrel_util.hpp"
 
+#include <cstring>
 #include <stdio.h>
 #include <sqstdaux.h>
 #include <sqstdblob.h>
@@ -195,6 +196,46 @@ void print_stack(HSQUIRRELVM vm, std::ostream& os)
   }
 }
 
+void print_stacktrace(HSQUIRRELVM vm, std::ostream& os)
+{
+  SQStackInfos stackinfos;
+
+  SQInteger max_level = 1;
+  while (SQ_SUCCEEDED(sq_stackinfos(vm, max_level++, &stackinfos))) {}
+
+  for (SQInteger level = max_level - 2; level > 0; --level)
+  {
+    SQInteger result = sq_stackinfos(vm, level, &stackinfos);
+    assert(SQ_SUCCEEDED(result));
+
+    SQChar const* source = stackinfos.source ? stackinfos.source : "<unknown>";
+    SQChar const* funcname = stackinfos.funcname ? stackinfos.funcname : "<unknown>";
+
+    os << "#" << (max_level - level - 2) << "  " << stackinfos.funcname << "(" << ")\n"
+       << "  at " << source << ":" << stackinfos.line << std::endl;
+
+    // FIXME: Any way to find out which of those are function
+    // arguments and which are variables? sq_getclosureinfo() needs a closure
+    SQInteger seq = 0;
+    SQChar const* name = nullptr;
+    while((name = sq_getlocal(vm, level, seq++)) != nullptr)
+    {
+      os << "  ";
+      // skip 'this' to reduce the noise
+      if (std::strcmp(name, "this") == 0) {
+        os << "this = <table>";
+      } else {
+        os << name;
+        os << " = ";
+        print(vm, -1, os);
+      }
+      os << std::endl;
+
+      sq_pop(vm, 1);
+    }
+  }
+}
+
 SQInteger squirrel_read_char(SQUserPointer file)
 {
   std::istream* in = reinterpret_cast<std::istream*> (file);
@@ -206,8 +247,9 @@ SQInteger squirrel_read_char(SQUserPointer file)
 
 void compile_script(HSQUIRRELVM vm, std::istream& in, const std::string& sourcename)
 {
-  if (SQ_FAILED(sq_compile(vm, squirrel_read_char, &in, sourcename.c_str(), true)))
-    throw SquirrelError(vm, "Couldn't parse script");
+  if (SQ_FAILED(sq_compile(vm, squirrel_read_char, &in, sourcename.c_str(), SQTrue))) {
+    throw SquirrelError(vm, "failed to compile script");
+  }
 }
 
 void compile_and_run(HSQUIRRELVM vm, std::istream& in,

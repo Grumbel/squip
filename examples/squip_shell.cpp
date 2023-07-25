@@ -77,12 +77,67 @@ int main(int argc, char** argv) try
       std::cerr << msg;
     });
 
+  //sqstd_seterrorhandlers(sqvm.get_vm());
+  sqvm.set_errorhandler([](HSQUIRRELVM vm) {
+    if (sq_gettop(vm) == 2) {
+      SQChar const* msg;
+      if (SQ_SUCCEEDED(sq_getstring(vm, 2, &msg))) {
+        // regular error, aka 'throw "string"'
+        squip::print_stacktrace(vm, std::cerr);
+        std::cerr << "error: " << msg << std::endl;
+      } else {
+        if ((false)) {
+          // non-string exception
+          squip::print_stacktrace(vm, std::cerr);
+          std::cerr << "error: <unknown failure>" << std::endl;
+        }
+      }
+    } else {
+      // weird stack state, shouldn't happen
+      squip::print_stacktrace(vm, std::cerr);
+      assert(false && "UNKNOWN FAILURE MODE");
+    }
+  });
+
   sqvm.set_compilererrorhandler([](char const* desc, char const* source, SQInteger line, SQInteger column){
     std::cerr << (source ? source : "<null>") << ":"
-              << line << ":" << column << ": "
+              << line << ":" << column << ": error: "
               << (desc ? desc : "<null>")
               << std::endl;
   });
+
+  if (opts.debug)
+  {
+    sq_enabledebuginfo(sqvm.get_vm(), opts.debug);
+    sq_notifyallexceptions(sqvm.get_vm(), SQTrue);
+    sq_setnativedebughook(
+      sqvm.get_vm(),
+      [](HSQUIRRELVM vm, SQInteger event_type, SQChar const* sourcename, SQInteger line, SQChar const* funcname)
+      {
+        std::cout << "[DBG] ";
+        switch (event_type)
+        {
+          case 'l':
+            std::cout << "line: ";
+            break;
+
+          case 'c':
+            std::cout << "call: ";
+            break;
+
+          case 'r':
+            std::cout << "return: ";
+            break;
+
+          default:
+            assert(false && "never reached");
+        }
+
+        std::cout << ": " << (sourcename ? sourcename : "<null>")
+                  << ":" << line
+                  << ":" << (funcname ? funcname : "<null>") << "\n";
+      });
+  }
 
   sqvm.bind("doit", ". i|f|b i|f|b i|f|b", [](HSQUIRRELVM vm) -> SQInteger {
     std::cout << "custom function: enter\n";

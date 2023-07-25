@@ -201,11 +201,11 @@ int main(int argc, char** argv) try
     squip::compile_and_run(sqvm.get_vm(), is, "<source>");
   }
 
-  // should result in nothing too, otherwise stack is corrupted
-  squip::print_stack(sqvm.get_vm(), std::cerr);
+  if (sq_gettop(sqvm.get_vm()) != 0) {
+    std::cerr << "Stack corruption detected:\n";
+    squip::print_stack(sqvm.get_vm(), std::cerr);
 
-  if (sq_gettop(sqvm.get_vm()) == 1) {
-    throw std::runtime_error("stack corrupted");
+    throw std::runtime_error("stack corrupted: ");
   }
 
   return EXIT_SUCCESS;

@@ -22,6 +22,10 @@ project(squip VERSION 0.0.0)
 
 include(mk/cmake/TinyCMMC.cmake)
 
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
 find_package(squirrel 3.2 REQUIRED)
 
 file(GLOB SQUIP_HEADERS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}

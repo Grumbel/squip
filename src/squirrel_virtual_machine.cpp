@@ -97,11 +97,11 @@ SquirrelVirtualMachine::SquirrelVirtualMachine(bool enable_debugger) :
   if (SQ_FAILED(sqstd_register_stringlib(m_vm.get_vm())))
     throw SquirrelError(m_vm.get_vm(), "Couldn't register string lib");
 
+#if 0
   // remove rand and srand calls from sqstdmath, we'll provide our own
   m_vm.delete_table_entry("srand");
   m_vm.delete_table_entry("rand");
 
-#if 0
   // register supertux API
   scripting::register_supertux_wrapper(m_vm.get_vm());
 #endif

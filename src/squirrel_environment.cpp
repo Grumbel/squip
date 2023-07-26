@@ -67,17 +67,21 @@ SquirrelEnvironment::~SquirrelEnvironment()
 void
 SquirrelEnvironment::expose_self()
 {
+#if 0
   sq_pushroottable(m_vm.get_vm());
   m_vm.store_object(m_name.c_str(), m_table);
   sq_pop(m_vm.get_vm(), 1);
+#endif
 }
 
 void
 SquirrelEnvironment::unexpose_self()
 {
+#if 0
   sq_pushroottable(m_vm.get_vm());
   m_vm.delete_table_entry(m_name.c_str());
   sq_pop(m_vm.get_vm(), 1);
+#endif
 }
 
 void

@@ -18,6 +18,7 @@
 #ifndef TABLE_CTX_HPP
 #define TABLE_CTX_HPP
 
+#include <functional>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -55,6 +56,28 @@ public:
   void store_float(std::string_view name, float val);
   void store_string(std::string_view name, std::string_view val);
   void store_object(std::string_view name, HSQOBJECT val);
+
+  /* typemask:
+     ‘o’ null
+     ‘i’ integer
+     ‘f’ float
+     ‘n’ integer or float
+     ‘s’ string
+     ‘t’ table
+     ‘a’ array
+     ‘u’ userdata
+     ‘c’ closure and nativeclosure
+     ‘g’ generator
+     ‘p’ userpointer
+     ‘v’ thread
+     ‘x’ instance(class instance)
+     ‘y’ class
+     ‘b’ bool
+     ‘.’ any type.
+     '|' used as ‘or’ to accept multiple types
+  */
+  void store_c_function(std::string_view name, char const* typemask, SQFUNCTION func);
+  void store_function(std::string_view name, const char* typemask, std::function<SQInteger (HSQUIRRELVM)> func);
 
   bool read_bool(std::string_view name, bool& val);
   bool read_int(std::string_view name, int& val);

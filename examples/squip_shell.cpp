@@ -61,6 +61,65 @@ Options parse_args(int argc, char** argv)
   return opts;
 }
 
+void register_functions(squip::TableContext& tbl)
+{
+  tbl.store_c_function("doit", ". i|f|b i|f|b i|f|b", [](HSQUIRRELVM vm) -> SQInteger {
+    std::cout << "custom function: enter\n";
+
+    SQInteger top = -4;
+    SQInteger arg1;
+    if(SQ_FAILED(sq_getinteger(vm, top + 0, &arg1))) {
+      sq_throwerror(vm, _SC("Argument 1 not an integer"));
+      return SQ_ERROR;
+    }
+
+    SQInteger arg2;
+    if(SQ_FAILED(sq_getinteger(vm, top + 1, &arg2))) {
+      sq_throwerror(vm, _SC("Argument 2 not an integer"));
+      return SQ_ERROR;
+    }
+
+    SQInteger arg3;
+    if(SQ_FAILED(sq_getinteger(vm, top + 2, &arg3))) {
+      sq_throwerror(vm, _SC("Argument 3 not an integer"));
+      return SQ_ERROR;
+    }
+
+    SQUserPointer userptr;
+    if(SQ_FAILED(sq_getuserpointer(vm, top + 3, &userptr))) {
+      sq_throwerror(vm, _SC("Argument 4 not a userpointer"));
+      return SQ_ERROR;
+    }
+
+    std::cout << "arguments: " << arg1 << " " << arg2 << " " << arg3 << std::endl;
+    std::cout << "custom function: end\n";
+
+    return SQ_OK;
+  });
+
+  tbl.store_function("dodo", ".", [](HSQUIRRELVM vm) -> SQInteger {
+    std::cout << "dodo!" << std::endl;
+    return SQ_OK;
+  });
+
+  tbl.store_c_function("myprintln", nullptr, [](HSQUIRRELVM vm) -> SQInteger {
+    SQInteger const nargs = sq_gettop(vm);
+    for (int idx = 1; idx < nargs; ++idx) {
+      squip::print(vm, idx + 1, std::cout);
+    }
+    std::cout << std::endl;
+    return SQ_OK;
+  });
+
+  tbl.store_c_function("myprint", nullptr, [](HSQUIRRELVM vm) -> SQInteger {
+    SQInteger const nargs = sq_gettop(vm);
+    for (int idx = 1; idx < nargs; ++idx) {
+      squip::print(vm, idx + 1, std::cout);
+    }
+    return SQ_OK;
+  });
+}
+
 } // namespace
 
 int main(int argc, char** argv) try
@@ -139,53 +198,10 @@ int main(int argc, char** argv) try
       });
   }
 
-  sqvm.bind("doit", ". i|f|b i|f|b i|f|b", [](HSQUIRRELVM vm) -> SQInteger {
-    std::cout << "custom function: enter\n";
-
-    SQInteger top = -4;
-    SQInteger arg1;
-    if(SQ_FAILED(sq_getinteger(vm, top + 0, &arg1))) {
-      sq_throwerror(vm, _SC("Argument 1 not an integer"));
-      return SQ_ERROR;
-    }
-
-    SQInteger arg2;
-    if(SQ_FAILED(sq_getinteger(vm, top + 1, &arg2))) {
-      sq_throwerror(vm, _SC("Argument 2 not an integer"));
-      return SQ_ERROR;
-    }
-
-    SQInteger arg3;
-    if(SQ_FAILED(sq_getinteger(vm, top + 2, &arg3))) {
-      sq_throwerror(vm, _SC("Argument 3 not an integer"));
-      return SQ_ERROR;
-    }
-
-    SQUserPointer userptr;
-    if(SQ_FAILED(sq_getuserpointer(vm, top + 3, &userptr))) {
-      sq_throwerror(vm, _SC("Argument 4 not a userpointer"));
-      return SQ_ERROR;
-    }
-
-    std::cout << "arguments: " << arg1 << " " << arg2 << " " << arg3 << std::endl;
-    std::cout << "custom function: end\n";
-
-    return SQ_OK;
-  });
-
-  sqvm.bindpp("dodo", ".", [](HSQUIRRELVM vm) -> SQInteger {
-    std::cout << "dodo!" << std::endl;
-    return SQ_OK;
-  });
-
-  sqvm.bind("myprintln", "..", [](HSQUIRRELVM vm) -> SQInteger {
-    squip::print(vm, -1, std::cout);
-    std::cout << std::endl;
-    return SQ_OK;
-  });
-
-  // should result in nothing
-  squip::print_stack(sqvm.get_vm(), std::cerr);
+  {
+    squip::TableContext root = sqvm.get_roottable();
+    register_functions(root);
+  }
 
   for (auto const& filename : opts.files) {
     std::ifstream fin(filename);

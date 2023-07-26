@@ -123,6 +123,51 @@ TableContext::store_object(std::string_view name, HSQOBJECT val)
   }
 }
 
+void
+TableContext::store_c_function(std::string_view name, char const* typemask, SQFUNCTION func)
+{
+  sq_pushstring(m_vm, name.data(), name.size());
+  sq_newclosure(m_vm, func, 0);
+  sq_setparamscheck(m_vm, SQ_MATCHTYPEMASKSTRING, typemask);
+
+  if(SQ_FAILED(sq_createslot(m_vm, -3))) {
+    throw SquirrelError(m_vm, "Couldn't register function");
+  }
+}
+
+void
+TableContext::store_function(std::string_view name, const char* typemask, std::function<SQInteger (HSQUIRRELVM)> func)
+{
+  sq_pushstring(m_vm, name.data(), name.size());
+
+  SQUserPointer userptr = sq_newuserdata(m_vm, sizeof(func));
+  new(userptr) std::function<SQInteger (HSQUIRRELVM)>(std::move(func));
+  sq_setreleasehook(m_vm, -1, [](SQUserPointer uptr, SQInteger size) -> SQInteger {
+    auto* funcptr = reinterpret_cast<std::function<SQInteger (HSQUIRRELVM)>*>(uptr);
+    funcptr->~function<SQInteger (HSQUIRRELVM)>();
+    return 1;
+  });
+
+  sq_newclosure(m_vm, [](HSQUIRRELVM vm) -> SQInteger {
+    SQUserPointer uptr;
+    if (SQ_FAILED(sq_getuserdata(vm, -1, &uptr, nullptr))) {
+      sq_throwerror(vm, "invalid argument, must be userdata");
+      return SQ_ERROR;
+    }
+    auto* funcptr = reinterpret_cast<std::function<SQInteger (HSQUIRRELVM)>*>(uptr);
+    try {
+      return (*funcptr)(vm);
+    } catch (std::exception const& err) {
+      return sq_throwerror(vm, err.what());
+    }
+  }, 1);
+  sq_setparamscheck(m_vm, SQ_MATCHTYPEMASKSTRING, typemask);
+
+  if (SQ_FAILED(sq_createslot(m_vm, -3))) {
+    throw SquirrelError(m_vm, "Couldn't register function");
+  }
+}
+
 bool
 TableContext::read_bool(std::string_view name, bool& val)
 {

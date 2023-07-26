@@ -48,28 +48,6 @@ public:
 
   TableContext get_roottable() const;
 
-  /* typemask:
-     ‘o’ null
-     ‘i’ integer
-     ‘f’ float
-     ‘n’ integer or float
-     ‘s’ string
-     ‘t’ table
-     ‘a’ array
-     ‘u’ userdata
-     ‘c’ closure and nativeclosure
-     ‘g’ generator
-     ‘p’ userpointer
-     ‘v’ thread
-     ‘x’ instance(class instance)
-     ‘y’ class
-     ‘b’ bool
-     ‘.’ any type.
-     '|' used as ‘or’ to accept multiple types
-  */
-  void bind(char const* name, char const* typemask, SQFUNCTION func);
-  void bindpp(const char* name, const char* typemask, std::function<SQInteger (HSQUIRRELVM)> func);
-
   HSQOBJECT create_thread();
 
 private:

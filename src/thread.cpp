@@ -37,8 +37,6 @@ Thread::Thread(SquirrelVM& sqvm) :
     throw SquirrelError(m_vm, "Couldn't create new VM");
   }
 
-  sq_setforeignptr(m_vm, m_sqvm);
-
   sq_resetobject(&m_handle);
   if (SQ_FAILED(sq_getstackobj(m_sqvm->get_vm(), -1, &m_handle))) {
     throw SquirrelError(m_vm, "Couldn't get squirrel object from stack");

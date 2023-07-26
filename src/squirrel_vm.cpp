@@ -69,7 +69,7 @@ __attribute__((__format__ (__printf__, 2, 0)))
 void
 SquirrelVM::my_printfunc(HSQUIRRELVM vm, char const* fmt, ...)
 {
-  SquirrelVM* const sqvm = reinterpret_cast<SquirrelVM*>(sq_getforeignptr(vm));
+  SquirrelVM* const sqvm = reinterpret_cast<SquirrelVM*>(sq_getsharedforeignptr(vm));
 
   va_list args;
   va_start(args, fmt);
@@ -87,7 +87,7 @@ __attribute__((__format__ (__printf__, 2, 0)))
 void
 SquirrelVM::my_errorfunc(HSQUIRRELVM vm, char const* fmt, ...)
 {
-  SquirrelVM * const sqvm = reinterpret_cast<SquirrelVM*>(sq_getforeignptr(vm));
+  SquirrelVM * const sqvm = reinterpret_cast<SquirrelVM*>(sq_getsharedforeignptr(vm));
 
   va_list args;
   va_start(args, fmt);
@@ -103,7 +103,7 @@ void
 SquirrelVM::my_compilererrorhandler(HSQUIRRELVM vm,
                                     SQChar const* desc, SQChar const* source, SQInteger line, SQInteger column)
 {
-  SquirrelVM* sqvm = reinterpret_cast<SquirrelVM*>(sq_getforeignptr(vm));
+  SquirrelVM* sqvm = reinterpret_cast<SquirrelVM*>(sq_getsharedforeignptr(vm));
   assert(sqvm != nullptr);
 
   if (sqvm->m_compilererrorhandler) {
@@ -114,7 +114,7 @@ SquirrelVM::my_compilererrorhandler(HSQUIRRELVM vm,
 SQRESULT
 SquirrelVM::my_errorhandler(HSQUIRRELVM vm)
 {
-  SquirrelVM* sqvm = reinterpret_cast<SquirrelVM*>(sq_getforeignptr(vm));
+  SquirrelVM* sqvm = reinterpret_cast<SquirrelVM*>(sq_getsharedforeignptr(vm));
   assert(sqvm != nullptr);
 
   if (sqvm->m_errorhandler) {
@@ -136,7 +136,7 @@ SquirrelVM::SquirrelVM() :
     throw std::runtime_error("Couldn't initialize squirrel vm");
   }
 
-  sq_setforeignptr(m_vm, this);
+  sq_setsharedforeignptr(m_vm, this);
 }
 
 SquirrelVM::~SquirrelVM()

@@ -137,25 +137,45 @@ void print(HSQUIRRELVM vm, SQInteger idx, std::ostream& os)
       break;
     }
 
-    case OT_USERDATA:
-      os << "<userdata>";
+    case OT_USERDATA: {
+      SQUserPointer userptr;
+      SQUserPointer typetag;
+      sq_getuserdata(vm, -1, &userptr, &typetag);
+      os << fmt::format("<userdata:{:p}:{:p}>", userptr, typetag);
       break;
+    }
 
     case OT_CLOSURE:
-      os << "<closure>";
+      if (SQ_FAILED(sq_getclosurename(vm, -1))) {
+        os << "<closure:<anonymous>>";
+      } else {
+        char const* name = nullptr;
+        sq_getstring(vm, -1, &name);
+        os << fmt::format("<closure:{}()>", name ? name : "<anonymous>");
+      }
       break;
 
-    case OT_NATIVECLOSURE:
-      os << "<native closure>";
+    case OT_NATIVECLOSURE: {
+      if (SQ_FAILED(sq_getclosurename(vm, -1))) {
+        os << "<native closure:<anonymous>>";
+      } else {
+        char const* name = nullptr;
+        sq_getstring(vm, -1, &name);
+        os << fmt::format("<native closure:{}()>", name ? name : "<anonymous>");
+      }
       break;
+    }
 
     case OT_GENERATOR:
       os << "<generator>";
       break;
 
-    case OT_USERPOINTER:
-      os << "userpointer";
+    case OT_USERPOINTER: {
+      SQUserPointer userptr;
+      sq_getuserpointer(vm, -1, &userptr);
+      os << fmt::format("<userpointer:{:p}>", userptr);
       break;
+    }
 
     case OT_THREAD:
       os << "<thread>";

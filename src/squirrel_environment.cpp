@@ -54,10 +54,6 @@ SquirrelEnvironment::SquirrelEnvironment(SquirrelVM& vm, const std::string& name
 
 SquirrelEnvironment::~SquirrelEnvironment()
 {
-  for (auto& script: m_scripts)
-  {
-    sq_release(m_vm.get_vm(), &script);
-  }
   m_scripts.clear();
   sq_release(m_vm.get_vm(), &m_table);
 
@@ -144,15 +140,9 @@ SquirrelEnvironment::garbage_collect()
 {
   m_scripts.erase(
     std::remove_if(m_scripts.begin(), m_scripts.end(),
-                   [this](HSQOBJECT& object){
-                     HSQUIRRELVM vm = object_to_vm(object);
-
-                     if (sq_getvmstate(vm) != SQ_VMSTATE_SUSPENDED) {
-                       sq_release(m_vm.get_vm(), &object);
-                       return true;
-                     } else {
-                       return false;
-                     }
+                   [this](Thread& thread){
+                     HSQUIRRELVM vm = thread.get_vm();
+                     return sq_getvmstate(vm) != SQ_VMSTATE_SUSPENDED;
                    }),
     m_scripts.end());
 }
@@ -164,10 +154,9 @@ SquirrelEnvironment::run_script(std::istream& in, const std::string& sourcename)
 
   try
   {
-    HSQOBJECT object = m_vm.create_thread();
-    m_scripts.push_back(object);
-
-    HSQUIRRELVM vm = object_to_vm(object);
+    Thread thread = m_vm.create_thread();
+    HSQUIRRELVM vm = thread.get_vm();
+    m_scripts.emplace_back(std::move(thread));
 
     sq_setforeignptr(vm, this);
 

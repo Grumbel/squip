@@ -84,7 +84,7 @@ private:
   SquirrelVM& m_vm;
   HSQOBJECT m_table;
   std::string m_name;
-  std::vector<HSQOBJECT> m_scripts;
+  std::vector<Thread> m_scripts;
   std::unique_ptr<SquirrelScheduler> m_scheduler;
 
 private:

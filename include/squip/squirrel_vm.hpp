@@ -26,6 +26,7 @@
 
 #include "squip/squirrel_error.hpp"
 #include "squip/table_context.hpp"
+#include "squip/thread.hpp"
 
 namespace squip {
 
@@ -48,7 +49,7 @@ public:
 
   TableContext get_roottable() const;
 
-  HSQOBJECT create_thread();
+  Thread create_thread();
 
 private:
   static void my_printfunc(HSQUIRRELVM vm, const char* fmt, ...);

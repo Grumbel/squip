@@ -182,22 +182,10 @@ SquirrelVM::get_roottable() const
   return TableContext(m_vm);
 }
 
-HSQOBJECT
+Thread
 SquirrelVM::create_thread()
 {
-  HSQUIRRELVM new_vm = sq_newthread(m_vm, 64);
-  if (new_vm == nullptr)
-    throw SquirrelError(m_vm, "Couldn't create new VM");
-
-  HSQOBJECT vm_object;
-  sq_resetobject(&vm_object);
-  if (SQ_FAILED(sq_getstackobj(m_vm, -1, &vm_object)))
-    throw SquirrelError(m_vm, "Couldn't get squirrel thread from stack");
-  sq_addref(m_vm, &vm_object);
-
-  sq_pop(m_vm, 1);
-
-  return vm_object;
+  return Thread(*this);
 }
 
 } // namespace squip

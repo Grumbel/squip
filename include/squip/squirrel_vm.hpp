@@ -25,6 +25,7 @@
 #include <squirrel.h>
 
 #include "squip/squirrel_error.hpp"
+#include "squip/table_context.hpp"
 
 namespace squip {
 
@@ -45,37 +46,7 @@ public:
                                 void (SQChar const*, SQChar const*, SQInteger, SQInteger)> compilererrorhandler);
   void set_errorhandler(std::function<void (HSQUIRRELVM)> errorhandler);
 
-  void begin_table(const char* name);
-  void end_table(const char* name);
-
-  /** Creates an empty table with given name
-      @param vm VM to create table on
-      @param name Name of the table to create */
-  void create_empty_table(const char* name);
-
-  bool has_property(const char* name);
-
-  void store_bool(const char* name, bool val);
-  void store_int(const char* name, int val);
-  void store_float(const char* name, float val);
-  void store_string(const char* name, const std::string& val);
-  void store_object(const char* name, const HSQOBJECT& val);
-
-  bool get_bool(const char* name, bool& val);
-  bool get_int(const char* name, int& val);
-  bool get_float(const char* name, float& val);
-  bool get_string(const char* name, std::string& val);
-
-  bool read_bool(const char* name);
-  int read_int(const char* name);
-  float read_float(const char* name);
-  std::string read_string(const char* name);
-
-  void get_table_entry(const std::string& name);
-  void get_or_create_table_entry(const std::string& name);
-  void delete_table_entry(const char* name);
-  void rename_table_entry(const char* oldname, const char* newname);
-  std::vector<std::string> get_table_keys();
+  TableContext get_roottable() const;
 
   /* typemask:
      ‘o’ null

@@ -133,7 +133,7 @@ SquirrelVM::SquirrelVM() :
 {
   m_vm = sq_open(64);
   if (m_vm == nullptr) {
-    throw std::runtime_error("Couldn't initialize squirrel vm");
+    throw std::runtime_error("failed to initialize SquirrelVM");
   }
 
   sq_setsharedforeignptr(m_vm, this);

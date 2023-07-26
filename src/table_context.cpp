@@ -19,6 +19,7 @@
 
 #include <cassert>
 #include <sstream>
+#include <fmt/format.h>
 
 #include "squip/squirrel_error.hpp"
 
@@ -79,7 +80,7 @@ TableContext::store_bool(std::string_view name, bool val)
   sq_pushstring(m_vm, name.data(), name.size());
   sq_pushbool(m_vm, val ? SQTrue : SQFalse);
   if (SQ_FAILED(sq_createslot(m_vm, -3))) {
-    throw SquirrelError(m_vm, "Couldn't add float value to table");
+    throw SquirrelError(m_vm, "failed to add float value to table");
   }
 }
 
@@ -89,7 +90,7 @@ TableContext::store_int(std::string_view name, int val)
   sq_pushstring(m_vm, name.data(), name.size());
   sq_pushinteger(m_vm, val);
   if (SQ_FAILED(sq_createslot(m_vm, -3))) {
-    throw SquirrelError(m_vm, "Couldn't add int value to table");
+    throw SquirrelError(m_vm, "failed to add int value to table");
   }
 }
 
@@ -99,7 +100,7 @@ TableContext::store_float(std::string_view name, float val)
   sq_pushstring(m_vm, name.data(), name.size());
   sq_pushfloat(m_vm, val);
   if (SQ_FAILED(sq_createslot(m_vm, -3))) {
-    throw SquirrelError(m_vm, "Couldn't add float value to table");
+    throw SquirrelError(m_vm, "failed to add float value to table");
   }
 }
 
@@ -109,7 +110,7 @@ TableContext::store_string(std::string_view name, std::string_view val)
   sq_pushstring(m_vm, name.data(), name.size());
   sq_pushstring(m_vm, val.data(), val.size());
   if (SQ_FAILED(sq_createslot(m_vm, -3))) {
-    throw SquirrelError(m_vm, "Couldn't add float value to table");
+    throw SquirrelError(m_vm, "failed to add float value to table");
   }
 }
 
@@ -119,7 +120,7 @@ TableContext::store_object(std::string_view name, HSQOBJECT val)
   sq_pushstring(m_vm, name.data(), name.size());
   sq_pushobject(m_vm, val);
   if (SQ_FAILED(sq_createslot(m_vm, -3))) {
-    throw SquirrelError(m_vm, "Couldn't add object value to table");
+    throw SquirrelError(m_vm, "failed to add object value to table");
   }
 }
 
@@ -131,7 +132,7 @@ TableContext::store_c_function(std::string_view name, char const* typemask, SQFU
   sq_setparamscheck(m_vm, SQ_MATCHTYPEMASKSTRING, typemask);
 
   if(SQ_FAILED(sq_createslot(m_vm, -3))) {
-    throw SquirrelError(m_vm, "Couldn't register function");
+    throw SquirrelError(m_vm, "failed to register function");
   }
 }
 
@@ -164,7 +165,7 @@ TableContext::store_function(std::string_view name, const char* typemask, std::f
   sq_setparamscheck(m_vm, SQ_MATCHTYPEMASKSTRING, typemask);
 
   if (SQ_FAILED(sq_createslot(m_vm, -3))) {
-    throw SquirrelError(m_vm, "Couldn't register function");
+    throw SquirrelError(m_vm, "failed to register function");
   }
 }
 
@@ -207,9 +208,7 @@ TableContext::get_bool(std::string_view name)
 
   SQBool result;
   if (SQ_FAILED(sq_getbool(m_vm, -1, &result))) {
-    std::ostringstream msg;
-    msg << "Couldn't get bool value for '" << name << "' from table";
-    throw SquirrelError(m_vm, msg.str());
+    throw SquirrelError(m_vm, fmt::format("failed to get bool value for '{}' from table", name));
   }
   sq_pop(m_vm, 1);
 
@@ -223,9 +222,7 @@ TableContext::get_int(std::string_view name)
 
   SQInteger result;
   if (SQ_FAILED(sq_getinteger(m_vm, -1, &result))) {
-    std::ostringstream msg;
-    msg << "Couldn't get int value for '" << name << "' from table";
-    throw SquirrelError(m_vm, msg.str());
+    throw SquirrelError(m_vm, fmt::format("failed to get int value for '{}' from table", name));
   }
   sq_pop(m_vm, 1);
 
@@ -239,9 +236,7 @@ TableContext::get_float(std::string_view name)
 
   float result;
   if (SQ_FAILED(sq_getfloat(m_vm, -1, &result))) {
-    std::ostringstream msg;
-    msg << "Couldn't get float value for '" << name << "' from table";
-    throw SquirrelError(m_vm, msg.str());
+    throw SquirrelError(m_vm, fmt::format("failed to get float value for '{}' from table", name));
   }
   sq_pop(m_vm, 1);
 
@@ -255,9 +250,7 @@ TableContext::get_string(std::string_view name)
 
   char const* result;
   if (SQ_FAILED(sq_getstring(m_vm, -1, &result))) {
-    std::ostringstream msg;
-    msg << "Couldn't get string value for '" << name << "' from table";
-    throw SquirrelError(m_vm, msg.str());
+    throw SquirrelError(m_vm, fmt::format("failed to get string value for '{}' from table", name));
   }
   sq_pop(m_vm, 1);
 
@@ -270,9 +263,7 @@ TableContext::get_entry(std::string_view name)
   sq_pushstring(m_vm, name.data(), name.size());
   if (SQ_FAILED(sq_get(m_vm, -2)))
   {
-    std::ostringstream msg;
-    msg << "failed to get '" << name << "' table entry";
-    throw SquirrelError(m_vm, msg.str());
+    throw SquirrelError(m_vm, fmt::format("failed to get '{}' table entry", name));
   }
   else
   {
@@ -303,7 +294,7 @@ TableContext::rename_entry(std::string_view oldname, std::string_view newname)
   sq_pushstring(m_vm, oldname.data(), oldname.size());
   if (SQ_FAILED(sq_deleteslot(m_vm, oldtop, SQTrue))) {
     sq_settop(m_vm, oldtop);
-    throw SquirrelError(m_vm, "Couldn't find 'oldname' entry in table");
+    throw SquirrelError(m_vm, "failed to find 'oldname' entry in table");
   }
 
   // create new entry
@@ -325,7 +316,7 @@ TableContext::get_keys()
     char const* result;
     if (SQ_FAILED(sq_getstring(m_vm, -2, &result)))
     {
-      throw SquirrelError(m_vm, "Couldn't get string value for key");
+      throw SquirrelError(m_vm, "failed to get string value for key");
     }
     else
     {

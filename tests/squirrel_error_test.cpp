@@ -25,7 +25,7 @@ TEST(SquipSquirrelError, error)
     squip::compile_and_run(vm, is, "<source>");
     FAIL();
   } catch(squip::SquirrelError const& err) {
-    EXPECT_STREQ(err.what(), "SquirrelError: Couldn't start script (TestString)");
+    EXPECT_STREQ(err.what(), "SquirrelError: failed to run script: <source> (TestString)");
   }
 
   is = std::istringstream("a + b");

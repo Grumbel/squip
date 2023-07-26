@@ -84,7 +84,7 @@ SquirrelScheduler::schedule_thread(HSQUIRRELVM scheduled_vm, float time, bool sk
   ScheduleEntry entry;
   if (SQ_FAILED(sq_getstackobj(m_vm.get_vm(), -1, & entry.thread_ref))) {
     sq_pop(m_vm.get_vm(), 2);
-    throw SquirrelError(m_vm.get_vm(), "Couldn't get thread weakref from vm");
+    throw SquirrelError(m_vm.get_vm(), "failed to get thread weakref from vm");
   }
   entry.wakeup_time = time;
   entry.skippable = skippable;

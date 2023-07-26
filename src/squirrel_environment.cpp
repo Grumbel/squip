@@ -41,11 +41,11 @@ SquirrelEnvironment::SquirrelEnvironment(SquirrelVM& vm, const std::string& name
   sq_newtable(m_vm.get_vm());
   sq_pushroottable(m_vm.get_vm());
   if (SQ_FAILED(sq_setdelegate(m_vm.get_vm(), -2)))
-    throw SquirrelError(m_vm.get_vm(), "Couldn't set table delegate");
+    throw SquirrelError(m_vm.get_vm(), "failed to set table delegate");
 
   sq_resetobject(&m_table);
   if (SQ_FAILED(sq_getstackobj(m_vm.get_vm(), -1, &m_table))) {
-    throw SquirrelError(m_vm.get_vm(), "Couldn't get table");
+    throw SquirrelError(m_vm.get_vm(), "failed to get table");
   }
 
   sq_addref(m_vm.get_vm(), &m_table);
@@ -104,7 +104,7 @@ SquirrelEnvironment::try_unexpose(GameObject& object)
     try {
       script_object->unexpose(m_vm.get_vm(), -1);
     } catch(std::exception& e) {
-      log_warning << "Couldn't unregister object: " << e.what() << std::endl;
+      log_warning << "failed to unregister object: " << e.what() << std::endl;
     }
     sq_settop(m_vm.get_vm(), oldtop);
   }
@@ -121,7 +121,7 @@ SquirrelEnvironment::unexpose(const std::string& name)
     unexpose_object(m_vm.get_vm(), -1, name.c_str());
 #endif
   } catch(std::exception& e) {
-    log_warning << "Couldn't unregister object: " << e.what() << std::endl;
+    log_warning << "failed to unregister object: " << e.what() << std::endl;
   }
   sq_settop(m_vm.get_vm(), oldtop);
 }

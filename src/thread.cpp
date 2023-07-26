@@ -34,12 +34,12 @@ Thread::Thread(SquirrelVM& sqvm) :
 {
   m_vm = sq_newthread(m_sqvm->get_vm(), 64);
   if (m_vm == nullptr) {
-    throw SquirrelError(m_vm, "Couldn't create new VM");
+    throw SquirrelError(m_vm, "failed to create thread");
   }
 
   sq_resetobject(&m_handle);
   if (SQ_FAILED(sq_getstackobj(m_sqvm->get_vm(), -1, &m_handle))) {
-    throw SquirrelError(m_vm, "Couldn't get squirrel object from stack");
+    throw SquirrelError(m_vm, "failed to get object from stack");
   }
   sq_addref(m_sqvm->get_vm(), &m_handle);
 

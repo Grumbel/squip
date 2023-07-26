@@ -39,7 +39,7 @@ SquirrelThreadQueue::add(HSQUIRRELVM vm)
   HSQOBJECT object;
   if (SQ_FAILED(sq_getstackobj(m_vm.get_vm(), -1, &object))) {
     sq_pop(m_vm.get_vm(), 2);
-    throw SquirrelError(m_vm.get_vm(), "Couldn't get thread weakref from vm");
+    throw SquirrelError(m_vm.get_vm(), "failed get thread weakref from vm");
   }
   sq_addref(m_vm.get_vm(), &object);
   m_threads.push_back(object);
@@ -63,7 +63,7 @@ SquirrelThreadQueue::wakeup()
        SQ_SUCCEEDED(sq_getthread(m_vm.get_vm(), -1, &scheduled_vm)))
     {
       if (SQ_FAILED(sq_wakeupvm(scheduled_vm, SQFalse, SQFalse, SQTrue, SQFalse))) {
-        log_warning << "Couldn't wakeup scheduled squirrel VM" << std::endl;
+        log_warning << "failed to wakeup scheduled VM" << std::endl;
       }
     }
 

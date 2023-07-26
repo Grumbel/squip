@@ -79,7 +79,7 @@ SquirrelVirtualMachine::SquirrelVirtualMachine(bool enable_debugger) :
     sq_enabledebuginfo(m_vm.get_vm(), SQTrue);
     debugger = sq_rdbg_init(m_vm.get_vm(), 1234, SQFalse);
     if (debugger == nullptr)
-      throw SquirrelError(m_vm.get_vm(), "Couldn't initialize squirrel debugger");
+      throw SquirrelError(m_vm.get_vm(), "failed to initialize debugger");
 
     sq_enabledebuginfo(m_vm.get_vm(), SQTrue);
     log_info << "Waiting for debug client..." << std::endl;
@@ -91,11 +91,11 @@ SquirrelVirtualMachine::SquirrelVirtualMachine(bool enable_debugger) :
 
   sq_pushroottable(m_vm.get_vm());
   if (SQ_FAILED(sqstd_register_bloblib(m_vm.get_vm())))
-    throw SquirrelError(m_vm.get_vm(), "Couldn't register blob lib");
+    throw SquirrelError(m_vm.get_vm(), "failed to register blob lib");
   if (SQ_FAILED(sqstd_register_mathlib(m_vm.get_vm())))
-    throw SquirrelError(m_vm.get_vm(), "Couldn't register math lib");
+    throw SquirrelError(m_vm.get_vm(), "failed to register math lib");
   if (SQ_FAILED(sqstd_register_stringlib(m_vm.get_vm())))
-    throw SquirrelError(m_vm.get_vm(), "Couldn't register string lib");
+    throw SquirrelError(m_vm.get_vm(), "failed to register string lib");
 
 #if 0
   // remove rand and srand calls from sqstdmath, we'll provide our own
@@ -120,7 +120,7 @@ SquirrelVirtualMachine::SquirrelVirtualMachine(bool enable_debugger) :
     IFileStream stream(filename);
     compile_and_run(m_vm.get_vm(), stream, filename);
   } catch(std::exception& e) {
-    log_warning << "Couldn't load default.nut: " << e.what() << std::endl;
+    log_warning << "failed to load default.nut: " << e.what() << std::endl;
   }
 #endif
 }

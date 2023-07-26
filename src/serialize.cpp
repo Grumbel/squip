@@ -83,8 +83,9 @@ void load_squirrel_table(HSQUIRRELVM vm, SQInteger table_idx, const ReaderMappin
         break;
     }
 
-    if (SQ_FAILED(sq_createslot(vm, table_idx)))
-      throw SquirrelError(vm, "Couldn't create new index");
+    if (SQ_FAILED(sq_createslot(vm, table_idx))) {
+      throw SquirrelError(vm, "failed to create new index");
+    }
   }
 }
 

@@ -24,6 +24,8 @@
 #include <sqstdstring.h>
 #include <stdarg.h>
 
+#include <fmt/format.h>
+
 #include "squip/script_interface.hpp"
 
 namespace squip {
@@ -248,7 +250,7 @@ SQInteger squirrel_read_char(SQUserPointer file)
 void compile_script(HSQUIRRELVM vm, std::istream& in, const std::string& sourcename)
 {
   if (SQ_FAILED(sq_compile(vm, squirrel_read_char, &in, sourcename.c_str(), SQTrue))) {
-    throw SquirrelError(vm, "failed to compile script");
+    throw SquirrelError(vm, fmt::format("failed to compile script: {}", sourcename));
   }
 }
 
@@ -262,7 +264,7 @@ void compile_and_run(HSQUIRRELVM vm, std::istream& in,
   try {
     sq_pushroottable(vm);
     if (SQ_FAILED(sq_call(vm, 1, SQFalse, SQTrue)))
-      throw SquirrelError(vm, "Couldn't start script");
+      throw SquirrelError(vm, fmt::format("failed to run script: {}", sourcename));
   } catch(...) {
     sq_settop(vm, oldtop);
     throw;

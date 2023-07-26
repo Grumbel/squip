@@ -19,6 +19,7 @@
 #define TABLE_CTX_HPP
 
 #include <string>
+#include <string_view>
 #include <vector>
 
 #include <squirrel.h>
@@ -44,33 +45,34 @@ public:
   TableContext(TableContext&& other);
   TableContext& operator=(TableContext&& other);
 
+  /** pop the table from the stack */
   void end();
 
-  bool has_property(const char* name);
+  bool has_key(std::string_view name);
 
-  void store_bool(const char* name, bool val);
-  void store_int(const char* name, int val);
-  void store_float(const char* name, float val);
-  void store_string(const char* name, std::string const& val);
-  void store_object(const char* name, const HSQOBJECT& val);
+  void store_bool(std::string_view name, bool val);
+  void store_int(std::string_view name, int val);
+  void store_float(std::string_view name, float val);
+  void store_string(std::string_view name, std::string_view val);
+  void store_object(std::string_view name, HSQOBJECT val);
 
-  bool get_bool(const char* name, bool& val);
-  bool get_int(const char* name, int& val);
-  bool get_float(const char* name, float& val);
-  bool get_string(const char* name, std::string& val);
+  bool read_bool(std::string_view name, bool& val);
+  bool read_int(std::string_view name, int& val);
+  bool read_float(std::string_view name, float& val);
+  bool read_string(std::string_view name, std::string& val);
 
-  bool read_bool(const char* name);
-  int read_int(const char* name);
-  float read_float(const char* name);
-  std::string read_string(const char* name);
+  bool get_bool(std::string_view name);
+  int get_int(std::string_view name);
+  float get_float(std::string_view name);
+  std::string get_string(std::string_view name);
 
-  void get_table_entry(const std::string& name);
-  void get_or_create_table_entry(const std::string& name);
-  void delete_table_entry(const char* name);
-  void rename_table_entry(const char* oldname, const char* newname);
-  std::vector<std::string> get_table_keys();
+  void get_entry(std::string_view name);
+  void delete_entry(std::string_view name);
+  void rename_entry(std::string_view oldname, std::string_view newname);
+  std::vector<std::string> get_keys();
 
-  TableContext create_table(char const* name);
+  TableContext create_table(std::string_view name);
+  TableContext create_or_get_table(std::string_view name);
 
 private:
   HSQUIRRELVM m_vm;

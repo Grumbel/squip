@@ -15,12 +15,53 @@ TEST(SquipTableContext, store)
   root.store_float("floatvalue", 0.125);
   root.store_string("stringvalue", "StringValue");
 
-  EXPECT_EQ(root.read_bool("boolvalue"), true);
-  EXPECT_EQ(root.read_int("intvalue"), 45);
-  EXPECT_EQ(root.read_float("floatvalue"), 0.125);
-  EXPECT_EQ(root.read_string("stringvalue"), "StringValue");
+  ASSERT_EQ(root.get_bool("boolvalue"), true);
+  ASSERT_EQ(root.get_int("intvalue"), 45);
+  ASSERT_EQ(root.get_float("floatvalue"), 0.125);
+  ASSERT_EQ(root.get_string("stringvalue"), "StringValue");
 
-  root.end();
+  bool boolvalue = {};
+  int intvalue = {};
+  float floatvalue = {};
+  std::string stringvalue = {};
+
+  ASSERT_TRUE(root.read_bool("boolvalue", boolvalue));
+  ASSERT_TRUE(root.read_int("intvalue", intvalue));
+  ASSERT_TRUE(root.read_float("floatvalue", floatvalue));
+  ASSERT_TRUE(root.read_string("stringvalue", stringvalue));
+
+  ASSERT_EQ(boolvalue, true);
+  ASSERT_EQ(intvalue, 45);
+  ASSERT_EQ(floatvalue, 0.125);
+  ASSERT_EQ(stringvalue, "StringValue");
+
+  root.create_table("mytable");
+  ASSERT_TRUE(root.has_key("mytable"));
+
+  root.create_or_get_table("mytable1");
+  ASSERT_TRUE(root.has_key("mytable1"));
+
+  root.create_or_get_table("mytable");
+  ASSERT_TRUE(root.has_key("mytable"));
+
+  root.rename_entry("mytable", "mytablerenamed");
+  ASSERT_TRUE(root.has_key("mytablerenamed"));
+  ASSERT_FALSE(root.has_key("mytable"));
+
+  root.delete_entry("mytablerenamed");
+  ASSERT_FALSE(root.has_key("mytablerenamed"));
+
+  squip::TableContext tbl = root.create_table("newtable");
+
+  tbl.store_bool("tbl_boolvalue", true);
+  tbl.store_int("tbl_intvalue", 45);
+  tbl.store_float("tbl_floatvalue", 0.125);
+  tbl.store_string("tbl_stringvalue", "StringValue");
+
+  ASSERT_EQ(tbl.get_bool("tbl_boolvalue"), true);
+  ASSERT_EQ(tbl.get_int("tbl_intvalue"), 45);
+  ASSERT_EQ(tbl.get_float("tbl_floatvalue"), 0.125);
+  ASSERT_EQ(tbl.get_string("tbl_stringvalue"), "StringValue");
 }
 
 /* EOF */

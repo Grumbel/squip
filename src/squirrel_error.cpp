@@ -16,37 +16,43 @@
 
 #include "squip/squirrel_error.hpp"
 
+#include <cassert>
 #include <sstream>
+
+#include <fmt/format.h>
 
 namespace squip {
 
-SquirrelError::SquirrelError(HSQUIRRELVM v, const std::string& message_) throw() :
-  message()
+SquirrelError::SquirrelError(HSQUIRRELVM vm, std::string_view message) noexcept :
+  m_message()
 {
-  std::ostringstream msg;
-  msg << "Squirrel error: " << message_ << " (";
-  const char* lasterr;
-  sq_getlasterror(v);
-  if (sq_gettype(v, -1) != OT_STRING)
-  {
-    lasterr = "no error info";
+  SQInteger const oldtop = sq_gettop(vm);
+
+  char const* lasterr = "no error info";
+  sq_getlasterror(vm);
+
+  if (sq_gettype(vm, -1) != OT_STRING) {
+    if (SQ_FAILED(sq_tostring(vm, -1))) {
+      assert(false && "never reached");
+      goto end;
+    }
   }
-  else
-  {
-    sq_getstring(v, -1, &lasterr);
-  }
-  msg << lasterr << ")";
-  sq_pop(v, 1);
-  message = msg.str();
+
+  sq_getstring(vm, -1, &lasterr);
+
+end:
+  m_message = fmt::format("SquirrelError: {} ({})", message, lasterr);
+
+  sq_settop(vm, oldtop);
 }
 
 SquirrelError::~SquirrelError() throw()
 {}
 
-const char*
+char const*
 SquirrelError::what() const throw()
 {
-  return message.c_str();
+  return m_message.c_str();
 }
 
 } // namespace squip

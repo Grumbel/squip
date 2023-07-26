@@ -17,9 +17,11 @@
 #ifndef HEADER_SUPERTUX_SQUIRREL_SQUIRREL_ERROR_HPP
 #define HEADER_SUPERTUX_SQUIRREL_SQUIRREL_ERROR_HPP
 
-#include <squirrel.h>
 #include <stdexcept>
 #include <string>
+#include <string_view>
+
+#include <squirrel.h>
 
 namespace squip {
 
@@ -30,15 +32,15 @@ namespace squip {
 class SquirrelError final : public std::exception
 {
 public:
-  SquirrelError(HSQUIRRELVM v, const std::string& message) throw();
-  SquirrelError(const SquirrelError&) = default;
-  SquirrelError& operator=(const SquirrelError&) = default;
-  ~SquirrelError() throw() override;
+  SquirrelError(HSQUIRRELVM vm, std::string_view message) noexcept;
+  SquirrelError(SquirrelError const&) = default;
+  SquirrelError& operator=(SquirrelError const&) = default;
+  ~SquirrelError() noexcept override;
 
-  virtual const char* what() const throw() override;
+  virtual char const* what() const noexcept override;
 
 private:
-  std::string message;
+  std::string m_message;
 };
 
 } // namespace squip

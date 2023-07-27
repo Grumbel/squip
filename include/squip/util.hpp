@@ -23,9 +23,7 @@
 #include <sstream>
 #include <vector>
 
-#include "squip/squirrel_virtual_machine.hpp"
 #include "squip/squirrel_error.hpp"
-//#include "scripting/wrapper.hpp"
 
 namespace squip {
 
@@ -52,42 +50,6 @@ void compile_script(HSQUIRRELVM vm, std::istream& in,
                     const std::string& sourcename);
 void compile_and_run(HSQUIRRELVM vm, std::istream& in,
                      const std::string& sourcename);
-
-#if 0
-template<typename T>
-void expose_object(HSQUIRRELVM vm, SQInteger table_idx,
-                   std::unique_ptr<T> object, const std::string& name)
-{
-  sq_pushstring(vm, name.c_str(), -1);
-  scripting::create_squirrel_instance(vm, object.release(), true);
-
-  if (table_idx < 0)
-    table_idx -= 2;
-
-  // register instance in root table
-  if (SQ_FAILED(sq_createslot(vm, table_idx))) {
-    std::ostringstream msg;
-    msg << "Couldn't register object '" << name << "' in squirrel table";
-    throw SquirrelError(vm, msg.str());
-  }
-}
-
-static inline void unexpose_object(HSQUIRRELVM vm, SQInteger table_idx,
-                                   const std::string& name)
-{
-  assert(name.length() < static_cast<size_t>(std::numeric_limits<SQInteger>::max()));
-  sq_pushstring(vm, name.c_str(), static_cast<SQInteger>(name.length()));
-
-  if (table_idx < 0)
-    table_idx -= 1;
-
-  if (SQ_FAILED(sq_deleteslot(vm, table_idx, SQFalse))) {
-    std::ostringstream msg;
-    msg << "Couldn't unregister object '" << name << "' in squirrel root table";
-    throw SquirrelError(vm, msg.str());
-  }
-}
-#endif
 
 } // namespace squip
 

@@ -14,7 +14,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "squip/squirrel_util.hpp"
+#include "squip/util.hpp"
 
 #include <cstring>
 #include <stdio.h>
@@ -25,8 +25,6 @@
 #include <stdarg.h>
 
 #include <fmt/format.h>
-
-#include "squip/script_interface.hpp"
 
 namespace squip {
 

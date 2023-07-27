@@ -3,8 +3,8 @@
 #include <sstream>
 #include <vector>
 
-#include <squip/squirrel_util.hpp>
 #include <squip/squirrel_vm.hpp>
+#include <squip/util.hpp>
 
 TEST(SquipSquirrelVM, print)
 {

@@ -4,8 +4,9 @@
 #include <vector>
 
 #include <fmt/format.h>
-#include <squip/squirrel_util.hpp>
+
 #include <squip/squirrel_vm.hpp>
+#include <squip/util.hpp>
 
 TEST(SquipUtil, print_stack)
 {

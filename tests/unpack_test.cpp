@@ -4,9 +4,10 @@
 #include <vector>
 
 #include <fmt/format.h>
-#include <squip/unpack.hpp>
-#include <squip/squirrel_util.hpp>
+
 #include <squip/squirrel_vm.hpp>
+#include <squip/unpack.hpp>
+#include <squip/util.hpp>
 
 TEST(SquipUnpack, unpack)
 {

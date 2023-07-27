@@ -23,7 +23,8 @@
 #include <fmt/format.h>
 
 #include "squip/squirrel_error.hpp"
-#include "squip/squirrel_util.hpp"
+#include "squip/squirrel_vm.hpp"
+#include "squip/util.hpp"
 
 namespace squip {
 

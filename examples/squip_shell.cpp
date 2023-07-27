@@ -10,6 +10,7 @@
 #include <sqstdaux.h>
 
 #include <squip/squip.hpp>
+#include <squip/unpack.hpp>
 
 namespace {
 
@@ -99,6 +100,12 @@ void register_functions(squip::TableContext& tbl)
 
   tbl.store_function("dodo", ".", [](HSQUIRRELVM vm) -> SQInteger {
     std::cout << "dodo!" << std::endl;
+    return SQ_OK;
+  });
+
+  tbl.store_function("make_position", ".nn", [](HSQUIRRELVM vm) -> SQInteger {
+    auto [x, y] = squip::unpack_args<float, float>(vm);
+    fmt::print("make_position: {}, {}\n", x, y);
     return SQ_OK;
   });
 

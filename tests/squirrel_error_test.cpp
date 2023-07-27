@@ -18,6 +18,7 @@ TEST(SquipSquirrelError, error)
   } catch(squip::SquirrelError const& err) {
     EXPECT_STREQ(err.what(), "SquirrelError: TestError (null)");
   }
+  ASSERT_EQ(sq_gettop(vm), 0);
 
   try {
     is = std::istringstream("class TestErrorFromSquirrel { function _tostring() { return \"TestString\"; } }; "
@@ -27,16 +28,19 @@ TEST(SquipSquirrelError, error)
   } catch(squip::SquirrelError const& err) {
     EXPECT_STREQ(err.what(), "SquirrelError: failed to run script: <source> (TestString)");
   }
+  ASSERT_EQ(sq_gettop(vm), 0);
 
   is = std::istringstream("a + b");
   EXPECT_THROW({
       squip::compile_and_run(vm, is, "<source>");
     }, squip::SquirrelError);
+  ASSERT_EQ(sq_gettop(vm), 0);
 
   is = std::istringstream("11 + 22");
   EXPECT_NO_THROW({
       squip::compile_and_run(vm, is, "<source>");
     });
+  ASSERT_EQ(sq_gettop(vm), 0);
 }
 
 /* EOF */

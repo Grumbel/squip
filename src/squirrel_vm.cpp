@@ -20,6 +20,7 @@
 #include <cstdarg>
 #include <cstring>
 #include <stdexcept>
+#include <iostream>
 
 #include "squip/squirrel_error.hpp"
 #include "squip/squirrel_util.hpp"
@@ -141,6 +142,16 @@ SquirrelVM::SquirrelVM() :
 
 SquirrelVM::~SquirrelVM()
 {
+  SQInteger const top = sq_gettop(m_vm);
+  if (top != 0) {
+    std::cerr << "### fatal error: stack corruption, top is " << top << ", expected 0" << std::endl;
+    print_stack(m_vm, std::cerr);
+
+    // FIXME: can't assert() here as googletest would trigger it on failed
+    // tests, thus reducing the amount of useful information
+    // assert(top == 0 && "stack corruption");
+  }
+
 #ifdef ENABLE_SQDBG
   if (debugger != nullptr) {
     sq_rdbg_shutdown(debugger);

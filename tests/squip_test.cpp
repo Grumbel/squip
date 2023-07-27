@@ -20,7 +20,7 @@ TEST(SquipTest, to_string)
   sq_pushinteger(vm, 33); sq_arrayappend(vm, -2);
   sq_pushinteger(vm, 44); sq_arrayappend(vm, -2);
 
-  EXPECT_EQ(squip::to_string(vm, 1), "\"helloworld\"");
+  EXPECT_EQ(squip::to_string(vm, 1), "helloworld");
   EXPECT_EQ(squip::to_string(vm, 2), "45");
   EXPECT_EQ(squip::to_string(vm, 3), "0.125");
   EXPECT_EQ(squip::to_string(vm, 4), "true");
@@ -46,12 +46,12 @@ TEST(SquipTest, print_stack)
   sq_pushinteger(vm, 44); sq_arrayappend(vm, -2);
 
   char const* expected =
-    "1: \"helloworld\"\n"
-    "2: 45\n"
-    "3: 0.125\n"
-    "4: true\n"
-    "5: false\n"
-    "6: [11, 22, 33, 44]\n";
+    "#1  \"helloworld\"\n"
+    "#2  45\n"
+    "#3  0.125\n"
+    "#4  true\n"
+    "#5  false\n"
+    "#6  [11, 22, 33, 44]\n";
 
   std::ostringstream os;
   squip::print_stack(vm, os);

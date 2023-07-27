@@ -14,8 +14,12 @@ TEST(SquipUtil, print)
 
   std::istringstream is (
     "function myfunc() {};"
+    "myanonfunc <- function() {};"
     "class MyClass {};"
+    "MyClassClose <- MyClass;"
     "myinstance <- MyClass();"
+    "myotherinstance <- MyClass();"
+    "mycloneinstance <- myinstance;"
     "mygenerator <- (function() { yield; })();"
     "myarray <- [11, 22, 33];"
     "mytable <- { a = 11, b = 22, c = 33 };"
@@ -58,6 +62,12 @@ TEST(SquipUtil, print)
   os = {};
   sq_pushstring(vm, "Hello\nWorld", -1);
   squip::print(vm, -1, os);
+  EXPECT_EQ(os.str(), "Hello\nWorld");
+  sq_poptop(vm);
+
+  os = {};
+  sq_pushstring(vm, "Hello\nWorld", -1);
+  squip::repr(vm, -1, os);
   EXPECT_EQ(os.str(), "\"Hello\\nWorld\"");
   sq_poptop(vm);
 
@@ -98,7 +108,15 @@ TEST(SquipUtil, print)
   sq_pushstring(vm, "myfunc", -1);
   sq_get(vm, -2);
   squip::print(vm, -1, os);
-  EXPECT_EQ(os.str(), "<closure:myfunc()>");
+  EXPECT_EQ(os.str(), "<closure:myfunc>");
+  sq_pop(vm, 2);
+
+  os = {};
+  sq_pushroottable(vm);
+  sq_pushstring(vm, "myanonfunc", -1);
+  sq_get(vm, -2);
+  squip::print(vm, -1, os);
+  EXPECT_EQ(os.str(), "<closure:<anonymous>>");
   sq_pop(vm, 2);
 
   os = {};
@@ -106,31 +124,57 @@ TEST(SquipUtil, print)
   sq_pushstring(vm, "print", -1);
   sq_get(vm, -2);
   squip::print(vm, -1, os);
-  EXPECT_EQ(os.str(), fmt::format("<native closure:print()>"));
+  EXPECT_EQ(os.str(), fmt::format("<native closure:print>"));
   sq_pop(vm, 2);
 
   os = {};
   sq_pushroottable(vm);
   sq_pushstring(vm, "MyClass", -1);
   sq_get(vm, -2);
-  squip::print(vm, -1, os);
-  EXPECT_EQ(os.str(), "<class>");
-  sq_pop(vm, 2);
-
-  os = {};
-  sq_pushroottable(vm);
-  sq_pushstring(vm, "myinstance", -1);
+  sq_pushstring(vm, "MyClassClone", -1);
   sq_get(vm, -2);
   squip::print(vm, -1, os);
-  EXPECT_EQ(os.str(), "<instance>");
+  std::string mycloneclass = os.str();
+  os = {};
+  squip::print(vm, -1, os);
+  EXPECT_EQ(os.str(), mycloneclass);
   sq_pop(vm, 2);
+
+  {
+    os = {};
+    sq_pushstring(vm, "mycloneinstance", -1);
+    sq_get(vm, -2);
+    squip::print(vm, -1, os);
+    std::string mycloneinstance = os.str();
+    sq_pop(vm, 1);
+
+    os = {};
+    sq_pushstring(vm, "myotherinstance", -1);
+    sq_get(vm, -2);
+    squip::print(vm, -1, os);
+    std::string myotherinstance = os.str();
+    sq_pop(vm, 1);
+
+    os = {};
+    sq_pushroottable(vm);
+    sq_pushstring(vm, "myinstance", -1);
+    sq_get(vm, -2);
+    squip::print(vm, -1, os);
+    std::string myinstance = os.str();
+    sq_pop(vm, 1);
+
+    EXPECT_EQ(myinstance, mycloneinstance);
+    EXPECT_NE(myinstance, myotherinstance);
+    EXPECT_NE(mycloneinstance, myotherinstance);
+    sq_pop(vm, 2);
+  }
 
   os = {};
   sq_pushroottable(vm);
   sq_pushstring(vm, "mygenerator", -1);
   sq_get(vm, -2);
   squip::print(vm, -1, os);
-  EXPECT_EQ(os.str(), "<generator>");
+  EXPECT_TRUE(os.str().starts_with("<generator:"));
   sq_pop(vm, 2);
 
   os = {};
@@ -139,7 +183,7 @@ TEST(SquipUtil, print)
   sq_get(vm, -2);
   sq_weakref(vm, -1);
   squip::print(vm, -1, os);
-  EXPECT_EQ(os.str(), "<weakref>");
+  EXPECT_EQ(os.str(), "<weakref:[11, 22, 33]>");
   sq_pop(vm, 2);
 
   os = {};
@@ -147,7 +191,7 @@ TEST(SquipUtil, print)
   sq_pushstring(vm, "mythread", -1);
   sq_get(vm, -2);
   squip::print(vm, -1, os);
-  EXPECT_EQ(os.str(), "<thread>");
+  EXPECT_TRUE(os.str().starts_with("<thread:"));
   sq_pop(vm, 2);
 
   os.str();

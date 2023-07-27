@@ -32,6 +32,26 @@ namespace squip {
 
 void print(HSQUIRRELVM vm, SQInteger idx, std::ostream& os)
 {
+  switch (sq_gettype(vm, idx))
+  {
+    case OT_STRING: {
+      SQChar const* val;
+      if (SQ_FAILED(sq_getstring(vm, idx, &val))) {
+        os << "<failure>";
+      } else {
+        os << val;
+      }
+      break;
+    }
+
+    default:
+      repr(vm, idx, os);
+      break;
+  }
+}
+
+void repr(HSQUIRRELVM vm, SQInteger idx, std::ostream& os)
+{
   // convert idx to positive, as sq_pushnull() would otherwise invalidate it
   if (idx < 0) {
     idx = sq_gettop(vm) + idx + 1;
@@ -104,9 +124,9 @@ void print(HSQUIRRELVM vm, SQInteger idx, std::ostream& os)
         }
         first = false;
 
-        //here -1 is the value and -2 is the key
-        os << to_string(vm, -2) << ": "
-           << to_string(vm, -1);
+        repr(vm, -2, os);
+        os << ": ";
+        repr(vm, -1, os);
 
         sq_pop(vm, 2); //pops key and val before the nex iteration
       }
@@ -128,7 +148,7 @@ void print(HSQUIRRELVM vm, SQInteger idx, std::ostream& os)
 
         //here -1 is the value and -2 is the key
         // we ignore the key, since that is just the index in an array
-        os << to_string(vm, -1);
+        repr(vm, -1, os);
 
         sq_pop(vm, 2); //pops key and val before the nex iteration
       }
@@ -151,7 +171,7 @@ void print(HSQUIRRELVM vm, SQInteger idx, std::ostream& os)
       } else {
         char const* name = nullptr;
         sq_getstring(vm, -1, &name);
-        os << fmt::format("<closure:{}()>", name ? name : "<anonymous>");
+        os << fmt::format("<closure:{}>", name ? name : "<anonymous>");
       }
       break;
 
@@ -161,14 +181,20 @@ void print(HSQUIRRELVM vm, SQInteger idx, std::ostream& os)
       } else {
         char const* name = nullptr;
         sq_getstring(vm, -1, &name);
-        os << fmt::format("<native closure:{}()>", name ? name : "<anonymous>");
+        os << fmt::format("<native closure:{}>", name ? name : "<anonymous>");
       }
       break;
     }
 
-    case OT_GENERATOR:
-      os << "<generator>";
+    case OT_GENERATOR: {
+      HSQOBJECT obj;
+      if (SQ_FAILED(sq_getstackobj(vm, -1, &obj))) {
+        os << "<generator:<failure>>";
+      } else {
+        os << fmt::format("<generator:{:p}>", reinterpret_cast<void*>(obj._unVal.pGenerator));
+      }
       break;
+    }
 
     case OT_USERPOINTER: {
       SQUserPointer userptr;
@@ -177,21 +203,71 @@ void print(HSQUIRRELVM vm, SQInteger idx, std::ostream& os)
       break;
     }
 
-    case OT_THREAD:
-      os << "<thread>";
+    case OT_THREAD: {
+      HSQOBJECT obj;
+      if (SQ_FAILED(sq_getstackobj(vm, -1, &obj))) {
+        os << "<thread:<failure>>";
+      } else {
+        os << fmt::format("<thread:{:p}>", reinterpret_cast<void*>(obj._unVal.pThread));
+      }
       break;
+    }
 
-    case OT_CLASS:
-      os << "<class>";
+    case OT_CLASS: {
+      HSQOBJECT obj;
+      if (SQ_FAILED(sq_getstackobj(vm, -1, &obj))) {
+        os << "<class:<failure>>";
+      } else {
+        SQUserPointer typetag = nullptr;
+        if (SQ_FAILED(sq_gettypetag(vm, -1, &typetag))) {
+          os << "<class:<unknown>>";
+        } else {
+          os << fmt::format("<class:{:p}:{:p}>", reinterpret_cast<void*>(obj._unVal.pClass), typetag);
+        }
+      }
       break;
+    }
 
-    case OT_INSTANCE:
-      os << "<instance>";
-      break;
+    case OT_INSTANCE: {
+      std::string classstr;
+      if (SQ_FAILED(sq_getclass(vm, -1))) {
+        classstr = "<classunknown>";
+      } else {
+        std::ostringstream classos;
+        repr(vm, -1, classos);
+        sq_poptop(vm);
 
-    case OT_WEAKREF:
-      os << "<weakref>";
+        classstr = classos.str();
+      }
+
+      HSQOBJECT obj;
+      if (SQ_FAILED(sq_getstackobj(vm, -1, &obj))) {
+        os << "<instance:<failure>>";
+      } else {
+        SQUserPointer typetag = nullptr;
+        if (SQ_FAILED(sq_gettypetag(vm, -1, &typetag))) {
+          os << "<instance:<unknown>>";
+        } else {
+          os << fmt::format("<instance:{:s}:{:p}:{:p}>",
+                            classstr,
+                            reinterpret_cast<void*>(obj._unVal.pInstance),
+                            typetag);
+        }
+      }
       break;
+    }
+
+    case OT_WEAKREF: {
+      os << "<weakref:";
+      if (SQ_FAILED(sq_getweakrefval(vm, -1))) {
+        os << "<failure>";
+      } else {
+        repr(vm, -1, os);
+        sq_poptop(vm);
+      }
+      os << ">";
+      break;
+    }
 
     default:
       os << "<unknown>";
@@ -206,14 +282,21 @@ std::string to_string(HSQUIRRELVM vm, SQInteger idx)
   return os.str();
 }
 
+std::string to_repr(HSQUIRRELVM vm, SQInteger idx)
+{
+  std::ostringstream os;
+  repr(vm, idx, os);
+  return os.str();
+}
+
 void print_stack(HSQUIRRELVM vm, std::ostream& os)
 {
   SQInteger const top = sq_gettop(vm);
 
   for (int i = 1; i <= top; ++i)
   {
-    os << i << ": ";
-    print(vm, i, os);
+    os << "#" << i << "  ";
+    repr(vm, i, os);
     os << std::endl;
   }
 }
@@ -249,7 +332,7 @@ void print_stacktrace(HSQUIRRELVM vm, std::ostream& os)
       } else {
         os << name;
         os << " = ";
-        print(vm, -1, os);
+        repr(vm, -1, os);
       }
       os << std::endl;
 

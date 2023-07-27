@@ -26,6 +26,8 @@ TEST(SquipTest, to_string)
   EXPECT_EQ(squip::to_string(vm, 4), "true");
   EXPECT_EQ(squip::to_string(vm, 5), "false");
   EXPECT_EQ(squip::to_string(vm, 6), "[11, 22, 33, 44]");
+
+  sq_pop(vm, 6);
 }
 
 TEST(SquipTest, print_stack)
@@ -56,6 +58,8 @@ TEST(SquipTest, print_stack)
   std::ostringstream os;
   squip::print_stack(vm, os);
   EXPECT_EQ(os.str(), expected);
+
+  sq_pop(vm, 6);
 }
 
 /* EOF */

@@ -172,6 +172,7 @@ void repr(HSQUIRRELVM vm, SQInteger idx, std::ostream& os)
         char const* name = nullptr;
         sq_getstring(vm, -1, &name);
         os << fmt::format("<closure:{}>", name ? name : "<anonymous>");
+        sq_poptop(vm);
       }
       break;
 
@@ -182,6 +183,7 @@ void repr(HSQUIRRELVM vm, SQInteger idx, std::ostream& os)
         char const* name = nullptr;
         sq_getstring(vm, -1, &name);
         os << fmt::format("<native closure:{}>", name ? name : "<anonymous>");
+        sq_poptop(vm);
       }
       break;
     }
@@ -361,21 +363,15 @@ void compile_and_run(HSQUIRRELVM vm, std::istream& in,
                      const std::string& sourcename)
 {
   compile_script(vm, in, sourcename);
-
-  SQInteger oldtop = sq_gettop(vm);
-
-  try {
-    sq_pushroottable(vm);
-    if (SQ_FAILED(sq_call(vm, 1, SQFalse, SQTrue)))
-      throw SquirrelError(vm, fmt::format("failed to run script: {}", sourcename));
-  } catch(...) {
-    sq_settop(vm, oldtop);
-    throw;
+  sq_pushroottable(vm);
+  if (SQ_FAILED(sq_call(vm, 1, SQFalse /* retval */, SQTrue /* raiseerror */))) {
+    sq_pop(vm, 1);
+    throw SquirrelError(vm, fmt::format("failed to run script: {}", sourcename));
   }
 
   // we can remove the closure in case the script was not suspended
   if (sq_getvmstate(vm) != SQ_VMSTATE_SUSPENDED) {
-    sq_settop(vm, oldtop-1);
+    sq_pop(vm, 1);
   }
 }
 

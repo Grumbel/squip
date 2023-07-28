@@ -11,6 +11,7 @@
 
 #include <squip/squip.hpp>
 #include <squip/unpack.hpp>
+#include <squip/squirrel_error.hpp>
 
 namespace {
 
@@ -208,6 +209,106 @@ int main(int argc, char** argv) try
   {
     squip::TableContext root = sqvm.get_roottable();
     register_functions(root);
+  }
+
+  { // build a class
+    HSQUIRRELVM vm = sqvm.get_vm();
+    sq_pushroottable(vm);
+
+    sq_newclass(vm, 0);
+
+    sq_pushstring(vm, "Position", -1);
+    sq_push(vm, 2);
+    sq_newslot(vm, 1, false);
+
+    sq_pushstring(vm, "x", -1);
+    sq_pushinteger(vm, 11);
+    sq_newslot(vm, 2, false);
+
+    sq_pushstring(vm, "y", -1);
+    sq_pushinteger(vm, 22);
+    sq_newslot(vm, 2, false);
+
+    sq_pushstring(vm, "constructor", -1);
+    sq_newclosure(vm, [](HSQUIRRELVM lvm) -> SQRESULT {
+      sq_setinstanceup(lvm, 1, new std::string("Hello World"));
+
+      // set x
+      sq_pushstring(lvm, "x", -1);
+      sq_pushinteger(lvm, 111);
+      if (SQ_FAILED(sq_set(lvm, 1))) {
+        throw squip::SquirrelError(lvm, "failed to set");
+      }
+
+      // print
+      sq_pushstring(lvm, "print", -1);
+      if (SQ_FAILED(sq_get(lvm, 1))) {
+        throw squip::SquirrelError(lvm, "failed to get print()");
+      }
+      sq_push(lvm, 1);
+      sq_call(lvm, 1, SQFalse, SQFalse);
+      sq_poptop(lvm);
+
+      // set y
+      sq_pushstring(lvm, "y", -1);
+      sq_pushinteger(lvm, 222);
+      sq_set(lvm, 1);
+
+      return SQ_OK;
+    }, 0);
+    sq_newslot(vm, 2, false);
+
+    sq_setreleasehook(vm, 2, [](SQUserPointer userptr, SQInteger size) -> SQInteger {
+      std::string* stringptr = static_cast<std::string*>(userptr);
+      delete stringptr;
+      return 1;
+    });
+
+    sq_pushstring(vm, "print", -1);
+    sq_newclosure(vm, [](HSQUIRRELVM lvm) -> SQRESULT {
+      SQInteger x = 333;
+      SQInteger y = 666;
+
+      SQUserPointer userptr;
+      sq_getinstanceup(lvm, 1, &userptr, nullptr, SQFalse);
+
+      sq_pushstring(lvm, "x", -1);
+      sq_get(lvm, 1);
+      sq_getinteger(lvm, -1, &x);
+
+      sq_pushstring(lvm, "y", -1);
+      sq_get(lvm, 1);
+      sq_getinteger(lvm, -1, &y);
+
+      fmt::print("Position: {} - {}, {}\n",
+                 *static_cast<std::string*>(userptr),
+                 x, y);
+      return SQ_OK;
+    }, 0);
+    sq_newslot(vm, 2, false);
+
+    {
+      HSQMEMBERHANDLE x_memberhandle;
+      sq_pushstring(vm, "x", -1);
+      if (SQ_FAILED(sq_getmemberhandle(vm, 2, &x_memberhandle))) {
+        throw squip::SquirrelError(vm, "failed to get member handle");
+      }
+
+      SQInteger x;
+      if (SQ_FAILED(sq_getbyhandle(vm, 2, &x_memberhandle))) {
+        throw squip::SquirrelError(vm, "failed to get by member handle");
+      }
+
+      if (SQ_FAILED(sq_getinteger(vm, -1, &x))) {
+        throw squip::SquirrelError(vm, "failed to get integer");
+      }
+
+      fmt::print("x from member handle: {}\n", x);
+      sq_poptop(vm);
+    }
+
+    sq_pop(vm, 2);
+    assert(sq_gettop(vm) == 0);
   }
 
   for (auto const& filename : opts.files) {

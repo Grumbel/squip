@@ -15,8 +15,8 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#ifndef HEADER_SUPERTUX_SQUIRREL_SQUIRREL_ERROR_HPP
-#define HEADER_SUPERTUX_SQUIRREL_SQUIRREL_ERROR_HPP
+#ifndef HEADER_SQUIP_SQUIRREL_ERROR_HPP
+#define HEADER_SQUIP_SQUIRREL_ERROR_HPP
 
 #include <stdexcept>
 #include <string>

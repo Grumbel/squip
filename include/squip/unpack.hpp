@@ -14,8 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#ifndef UNPACK_HPP
-#define UNPACK_HPP
+#ifndef HEADER_SQUIP_UNPACK_HPP
+#define HEADER_SQUIP_UNPACK_HPP
 
 #include <iostream>
 #include <vector>

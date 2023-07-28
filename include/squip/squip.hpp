@@ -1,5 +1,3 @@
-#ifndef SQUIP_HPP
-#define SQUIP_HPP
 // squip - Utilities for Squirrel
 // Copyright (C) 2023 Ingo Ruhnke <grumbel@gmail.com>
 //
@@ -16,6 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+#ifndef HEADER_SQUIP_SQUIP_HPP
+#define HEADER_SQUIP_SQUIP_HPP
 
 #include <string>
 

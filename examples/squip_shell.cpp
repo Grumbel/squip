@@ -1,8 +1,10 @@
 #include <cstring>
+#include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <stdexcept>
 #include <string>
+#include <variant>
 #include <vector>
 
 #include <fmt/format.h>
@@ -18,8 +20,7 @@ namespace {
 struct Options
 {
   bool debug = false;
-  std::vector<std::string> files = {};
-  std::vector<std::string> rest = {};
+  std::vector<std::variant<std::filesystem::path, std::string>> code = {};
 };
 
 Options parse_args(int argc, char** argv)
@@ -37,7 +38,7 @@ Options parse_args(int argc, char** argv)
           throw std::runtime_error(fmt::format("'{}' requires an argument", argv[i - 1]));
         }
 
-        opts.files.emplace_back(argv[i]);
+        opts.code.emplace_back(std::filesystem::path(argv[i]));
       }
       else if (strcmp(argv[i], "-d") == 0 ||
                strcmp(argv[i], "--debug") == 0)
@@ -56,7 +57,7 @@ Options parse_args(int argc, char** argv)
     }
     else // rest arguments
     {
-      opts.rest.emplace_back(argv[i]);
+      opts.code.emplace_back(std::string(argv[i]));
     }
   }
 
@@ -311,18 +312,19 @@ int main(int argc, char** argv) try
     assert(sq_gettop(vm) == 0);
   }
 
-  for (auto const& filename : opts.files) {
-    std::ifstream fin(filename);
-    if (!fin) {
-      throw std::runtime_error(fmt::format("failed to load: {}", filename));
+  for (auto const& code : opts.code){
+    if (std::holds_alternative<std::filesystem::path>(code)) {
+      std::filesystem::path const& filename = std::get<std::filesystem::path>(code);
+      std::ifstream fin(filename);
+      if (!fin) {
+        throw std::runtime_error(fmt::format("failed to load: {}", filename.string()));
+      }
+      squip::compile_and_run(sqvm.get_vm(), fin, filename);
+    } else {
+      std::string const& text = std::get<std::string>(code);
+      std::istringstream is(text);
+      squip::compile_and_run(sqvm.get_vm(), is, "<source>");
     }
-
-    squip::compile_and_run(sqvm.get_vm(), fin, filename);
-  }
-
-  for (auto const& text : opts.rest) {
-    std::istringstream is(text);
-    squip::compile_and_run(sqvm.get_vm(), is, "<source>");
   }
 
   if (sq_gettop(sqvm.get_vm()) != 0) {

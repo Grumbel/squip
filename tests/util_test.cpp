@@ -226,4 +226,22 @@ TEST(SquipUtil, print)
   ASSERT_EQ(sq_gettop(vm), 0);
 }
 
+TEST(SquipUtil, store_function)
+{
+  squip::SquirrelVM sqvm;
+  HSQUIRRELVM vm = sqvm.get_vm();
+
+  std::string testdata = "TestData";
+  squip::push_function(vm, [&testdata](HSQUIRRELVM lvm) -> SQInteger {
+    testdata += "AddedFromInside";
+    return SQ_OK;
+  });
+
+  ASSERT_TRUE(SQ_SUCCEEDED(sq_call(vm, 0, SQFalse, SQFalse)));
+  sq_poptop(vm);
+  ASSERT_EQ(testdata, "TestDataAddedFromInside");
+
+  ASSERT_EQ(sq_gettop(vm), 0);
+}
+
 /* EOF */

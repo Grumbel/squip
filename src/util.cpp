@@ -381,6 +381,33 @@ HSQUIRRELVM object_to_vm(HSQOBJECT object)
   return object._unVal.pThread;
 }
 
+void
+push_function(HSQUIRRELVM vm, std::function<SQInteger (HSQUIRRELVM)> func)
+{
+  // store the data of std::function<> in a free variable as userdata
+  SQUserPointer userptr = sq_newuserdata(vm, sizeof(func));
+  new(userptr) std::function<SQInteger (HSQUIRRELVM)>(std::move(func));
+  sq_setreleasehook(vm, -1, [](SQUserPointer uptr, SQInteger size) -> SQInteger {
+    auto* funcptr = reinterpret_cast<std::function<SQInteger (HSQUIRRELVM)>*>(uptr);
+    funcptr->~function<SQInteger (HSQUIRRELVM)>();
+    return 1;
+  });
+
+  sq_newclosure(vm, [](HSQUIRRELVM vm) -> SQInteger {
+    SQUserPointer uptr;
+    if (SQ_FAILED(sq_getuserdata(vm, -1, &uptr, nullptr))) {
+      sq_throwerror(vm, "invalid argument, must be userdata");
+      return SQ_ERROR;
+    }
+    auto* funcptr = reinterpret_cast<std::function<SQInteger (HSQUIRRELVM)>*>(uptr);
+    try {
+      return (*funcptr)(vm);
+    } catch (std::exception const& err) {
+      return sq_throwerror(vm, err.what());
+    }
+  }, 1 /* nfreevars */);
+}
+
 } // namespace squip
 
 /* EOF */

@@ -22,6 +22,7 @@
 #include <fmt/format.h>
 
 #include "squip/squirrel_error.hpp"
+#include "squip/util.hpp"
 
 namespace squip {
 
@@ -140,28 +141,7 @@ void
 TableContext::store_function(std::string_view name, const char* typemask, std::function<SQInteger (HSQUIRRELVM)> func)
 {
   sq_pushstring(m_vm, name.data(), name.size());
-
-  SQUserPointer userptr = sq_newuserdata(m_vm, sizeof(func));
-  new(userptr) std::function<SQInteger (HSQUIRRELVM)>(std::move(func));
-  sq_setreleasehook(m_vm, -1, [](SQUserPointer uptr, SQInteger size) -> SQInteger {
-    auto* funcptr = reinterpret_cast<std::function<SQInteger (HSQUIRRELVM)>*>(uptr);
-    funcptr->~function<SQInteger (HSQUIRRELVM)>();
-    return 1;
-  });
-
-  sq_newclosure(m_vm, [](HSQUIRRELVM vm) -> SQInteger {
-    SQUserPointer uptr;
-    if (SQ_FAILED(sq_getuserdata(vm, -1, &uptr, nullptr))) {
-      sq_throwerror(vm, "invalid argument, must be userdata");
-      return SQ_ERROR;
-    }
-    auto* funcptr = reinterpret_cast<std::function<SQInteger (HSQUIRRELVM)>*>(uptr);
-    try {
-      return (*funcptr)(vm);
-    } catch (std::exception const& err) {
-      return sq_throwerror(vm, err.what());
-    }
-  }, 1);
+  push_function(m_vm, std::move(func));
   sq_setparamscheck(m_vm, SQ_MATCHTYPEMASKSTRING, typemask);
 
   if (SQ_FAILED(sq_createslot(m_vm, -3))) {

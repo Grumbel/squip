@@ -17,7 +17,8 @@
 #ifndef HEADER_SUPERTUX_SQUIRREL_SQUIRREL_UTIL_HPP
 #define HEADER_SUPERTUX_SQUIRREL_SQUIRREL_UTIL_HPP
 
-#include <assert.h>
+#include <cassert>
+#include <functional>
 #include <limits>
 #include <memory>
 #include <sstream>
@@ -50,6 +51,8 @@ void compile_script(HSQUIRRELVM vm, std::istream& in,
                     const std::string& sourcename);
 void compile_and_run(HSQUIRRELVM vm, std::istream& in,
                      const std::string& sourcename);
+
+void push_function(HSQUIRRELVM vm, std::function<SQInteger (HSQUIRRELVM)> func);
 
 } // namespace squip
 

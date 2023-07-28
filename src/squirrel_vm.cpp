@@ -190,7 +190,7 @@ TableContext
 SquirrelVM::get_roottable() const
 {
   sq_pushroottable(m_vm);
-  return TableContext(m_vm);
+  return TableContext(m_vm, -1);
 }
 
 Thread

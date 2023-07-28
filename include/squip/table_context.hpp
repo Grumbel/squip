@@ -40,7 +40,7 @@ namespace squip {
 class TableContext
 {
 public:
-  TableContext(HSQUIRRELVM vm);
+  TableContext(HSQUIRRELVM vm, SQInteger idx);
   ~TableContext();
 
   TableContext(TableContext&& other);
@@ -99,6 +99,7 @@ public:
 
 private:
   HSQUIRRELVM m_vm;
+  SQInteger m_idx;
 
 public:
   TableContext(TableContext const&) = delete;

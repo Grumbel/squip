@@ -26,15 +26,17 @@
 
 namespace squip {
 
-TableContext::TableContext(HSQUIRRELVM vm) :
-  m_vm(vm)
+TableContext::TableContext(HSQUIRRELVM vm, SQInteger idx) :
+  m_vm(vm),
+  m_idx(absolute_index(vm, idx))
 {
-  assert(sq_gettype(m_vm, -1) == OT_TABLE);
+  assert(sq_gettype(m_vm, m_idx) == OT_TABLE);
 }
 
 TableContext::~TableContext()
 {
   if (m_vm) {
+    assert(sq_gettop(m_vm) == m_idx);
     sq_pop(m_vm, 1);
   }
 }
@@ -68,7 +70,7 @@ bool
 TableContext::has_key(std::string_view name)
 {
   sq_pushstring(m_vm, name.data(), name.size());
-  if (SQ_FAILED(sq_get(m_vm, -2))) {
+  if (SQ_FAILED(sq_get(m_vm, m_idx))) {
     return false;
   }
   sq_pop(m_vm, 1);
@@ -80,7 +82,7 @@ TableContext::store_bool(std::string_view name, bool val)
 {
   sq_pushstring(m_vm, name.data(), name.size());
   sq_pushbool(m_vm, val ? SQTrue : SQFalse);
-  if (SQ_FAILED(sq_createslot(m_vm, -3))) {
+  if (SQ_FAILED(sq_createslot(m_vm, m_idx))) {
     throw SquirrelError(m_vm, "failed to add float value to table");
   }
 }
@@ -90,7 +92,7 @@ TableContext::store_int(std::string_view name, int val)
 {
   sq_pushstring(m_vm, name.data(), name.size());
   sq_pushinteger(m_vm, val);
-  if (SQ_FAILED(sq_createslot(m_vm, -3))) {
+  if (SQ_FAILED(sq_createslot(m_vm, m_idx))) {
     throw SquirrelError(m_vm, "failed to add int value to table");
   }
 }
@@ -100,7 +102,7 @@ TableContext::store_float(std::string_view name, float val)
 {
   sq_pushstring(m_vm, name.data(), name.size());
   sq_pushfloat(m_vm, val);
-  if (SQ_FAILED(sq_createslot(m_vm, -3))) {
+  if (SQ_FAILED(sq_createslot(m_vm, m_idx))) {
     throw SquirrelError(m_vm, "failed to add float value to table");
   }
 }
@@ -110,7 +112,7 @@ TableContext::store_string(std::string_view name, std::string_view val)
 {
   sq_pushstring(m_vm, name.data(), name.size());
   sq_pushstring(m_vm, val.data(), val.size());
-  if (SQ_FAILED(sq_createslot(m_vm, -3))) {
+  if (SQ_FAILED(sq_createslot(m_vm, m_idx))) {
     throw SquirrelError(m_vm, "failed to add float value to table");
   }
 }
@@ -120,7 +122,7 @@ TableContext::store_object(std::string_view name, HSQOBJECT val)
 {
   sq_pushstring(m_vm, name.data(), name.size());
   sq_pushobject(m_vm, val);
-  if (SQ_FAILED(sq_createslot(m_vm, -3))) {
+  if (SQ_FAILED(sq_createslot(m_vm, m_idx))) {
     throw SquirrelError(m_vm, "failed to add object value to table");
   }
 }
@@ -132,7 +134,7 @@ TableContext::store_c_function(std::string_view name, char const* typemask, SQFU
   sq_newclosure(m_vm, func, 0);
   sq_setparamscheck(m_vm, SQ_MATCHTYPEMASKSTRING, typemask);
 
-  if(SQ_FAILED(sq_createslot(m_vm, -3))) {
+  if(SQ_FAILED(sq_createslot(m_vm, m_idx))) {
     throw SquirrelError(m_vm, "failed to register function");
   }
 }
@@ -144,7 +146,7 @@ TableContext::store_function(std::string_view name, const char* typemask, std::f
   push_function(m_vm, std::move(func));
   sq_setparamscheck(m_vm, SQ_MATCHTYPEMASKSTRING, typemask);
 
-  if (SQ_FAILED(sq_createslot(m_vm, -3))) {
+  if (SQ_FAILED(sq_createslot(m_vm, m_idx))) {
     throw SquirrelError(m_vm, "failed to register function");
   }
 }
@@ -241,7 +243,7 @@ void
 TableContext::get_entry(std::string_view name)
 {
   sq_pushstring(m_vm, name.data(), name.size());
-  if (SQ_FAILED(sq_get(m_vm, -2)))
+  if (SQ_FAILED(sq_get(m_vm, m_idx)))
   {
     throw SquirrelError(m_vm, fmt::format("failed to get '{}' table entry", name));
   }
@@ -255,7 +257,7 @@ void
 TableContext::delete_entry(std::string_view name)
 {
   sq_pushstring(m_vm, name.data(), name.size());
-  if (SQ_FAILED(sq_deleteslot(m_vm, -2, false)))
+  if (SQ_FAILED(sq_deleteslot(m_vm, m_idx, false)))
   {
     // Something failed while deleting the table entry.
     // Key doesn't exist?
@@ -265,20 +267,20 @@ TableContext::delete_entry(std::string_view name)
 void
 TableContext::rename_entry(std::string_view oldname, std::string_view newname)
 {
-  SQInteger oldtop = sq_gettop(m_vm);
+  SQInteger const oldtop = sq_gettop(m_vm);
 
   // push key
   sq_pushstring(m_vm, newname.data(), newname.size());
 
   // push value and delete old oldname
   sq_pushstring(m_vm, oldname.data(), oldname.size());
-  if (SQ_FAILED(sq_deleteslot(m_vm, oldtop, SQTrue))) {
+  if (SQ_FAILED(sq_deleteslot(m_vm, m_idx, SQTrue))) {
     sq_settop(m_vm, oldtop);
     throw SquirrelError(m_vm, "failed to find 'oldname' entry in table");
   }
 
   // create new entry
-  sq_createslot(m_vm, -3);
+  sq_createslot(m_vm, m_idx);
 
   sq_settop(m_vm, oldtop);
 }
@@ -286,11 +288,11 @@ TableContext::rename_entry(std::string_view oldname, std::string_view newname)
 std::vector<std::string>
 TableContext::get_keys()
 {
-  auto old_top = sq_gettop(m_vm);
+  SQInteger const old_top = sq_gettop(m_vm);
   std::vector<std::string> keys;
 
   sq_pushnull(m_vm);
-  while (SQ_SUCCEEDED(sq_next(m_vm, -2)))
+  while (SQ_SUCCEEDED(sq_next(m_vm, m_idx)))
   {
     //here -1 is the value and -2 is the key
     char const* result;
@@ -320,23 +322,23 @@ TableContext::create_table(std::string_view name)
   sq_pushstring(m_vm, name.data(), name.size());
   sq_push(m_vm, -2);
 
-  if (SQ_FAILED(sq_createslot(m_vm, -4))) {
+  if (SQ_FAILED(sq_createslot(m_vm, m_idx))) {
     sq_pop(m_vm, 1);
     throw SquirrelError(m_vm, "Failed to create '" + std::string(name) + "' table entry");
   }
 
-  return TableContext(m_vm);
+  return TableContext(m_vm, -1);
 }
 
 TableContext
 TableContext::create_or_get_table(std::string_view name)
 {
   sq_pushstring(m_vm, name.data(), name.size());
-  if (SQ_FAILED(sq_get(m_vm, -2))) {
+  if (SQ_FAILED(sq_get(m_vm, m_idx))) {
     return create_table(name);
   }
 
-  return TableContext(m_vm);
+  return TableContext(m_vm, -1);
 }
 
 } // namespace squip

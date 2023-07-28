@@ -409,6 +409,15 @@ push_function(HSQUIRRELVM vm, std::function<SQInteger (HSQUIRRELVM)> func)
   }, 1 /* nfreevars */);
 }
 
+SQInteger absolute_index(HSQUIRRELVM vm, SQInteger idx)
+{
+  if (idx >= 0) {
+    return idx;
+  } else {
+    return sq_gettop(vm) + idx + 1;
+  }
+}
+
 } // namespace squip
 
 /* EOF */

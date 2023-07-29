@@ -64,6 +64,10 @@ arr3.append(10) // append one element to the array
 arr3.extend(arr1) // append another array to an array
 el3 <- arr3.remove(3) // remove the third element and return it
 
+// sorting with three-way compare
+arr3.sort(@(a, b) a <=> b) // this modifies the array and returns it
+local newarr = clone(arr3) // shallow copy of the array or table
+
 // enums
 enum MyEnum {
     a // 0
@@ -81,13 +85,18 @@ local z // this is initialized to null
 b <- 5;
 
 // a plain C-style loop
-for (local i = 0; i < 10; ++i) {
+for (local i = 0; i < 10; ++i) { // local keeps the variable in the loops scopes
     print(i + "\n")
 }
 
+for (i <- 0; i < 10; ++i) { // i stays available outside the loop
+    print(i + "\n")
+}
+print(i + "\n")
+
 // foreach loop
 print("foreach loop:\n")
-foreach(k, v in { x = 5, y = 10 }) {
+foreach(k, v in { x = 5, y = 10 }) { // no "local" allowed or necessary, it's implied
     print(k + " -> " + v + "\n")
 }
 
@@ -206,6 +215,26 @@ while(thread1.getstatus() == "suspended" || thread2.getstatus() == "suspended") 
     }
 }
 
+// closures
+{
+    // external variable can be modified from closure
+    function makeclosure() {
+        local i = 0
+        return function() {
+            return ++i
+        }
+    }
+
+    // each closure gets its own 'i'
+    clos1 <- makeclosure()
+    clos2 <- makeclosure()
+
+    print("clos1: " + clos1() + "\n")
+    print("clos2: " + clos2() + "\n")
+    print("clos1: " + clos1() + "\n")
+    print("clos2: " + clos2() + "\n")
+}
+
 // Surprises
 local boing = 155
 class Bar {
@@ -220,6 +249,9 @@ println(Bar().boing)
 
 // asserts
 assert(true, "Everything is ok")
+
+// return the current closure
+callee() // if you can the returned function you get an endless loop
 
 // special initialisation syntax, same as Bar().boing = 10
 Bar() { boing = 10 }
@@ -240,5 +272,37 @@ function foo() {
 // this can also be done for just a single call
 foo.pcall(env)
 println(env)
+
+
+// exceptions
+
+// this overrides the handler installed on the C side! It's called when an
+// exception leaves the program, kind of like std::terminate()
+seterrorhandler(function(err) {
+    print("myerror handler called\n")
+})
+
+class MyException
+{
+    msg = null
+
+    function constructor(msg) {
+        this.msg = msg
+    }
+
+    function _tostring() {
+        return "MyException(" + this.msg + ")"
+    }
+}
+
+try {
+    throw MyException("kaputt!")
+} catch (err) { // can't catch a specific exception :(
+    print("caught error: " + err + "\n")
+    // throw err // rethrowing the current exception
+}
+
+// scripts can have return values
+return 10
 
 /* EOF */

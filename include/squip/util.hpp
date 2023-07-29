@@ -54,6 +54,9 @@ void compile_and_run(HSQUIRRELVM vm, std::istream& in,
 
 void push_function(HSQUIRRELVM vm, std::function<SQInteger (HSQUIRRELVM)> func);
 
+void write_closure(HSQUIRRELVM vm, std::ostream& out);
+void read_closure(HSQUIRRELVM vm, std::istream& in);
+
 /** Convert the given index into a positive index (e.g. -1 -> sq_gettop()) */
 SQInteger absolute_index(HSQUIRRELVM vm, SQInteger idx);
 

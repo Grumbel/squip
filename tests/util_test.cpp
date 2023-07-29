@@ -244,4 +244,40 @@ TEST(SquipUtil, store_function)
   ASSERT_EQ(sq_gettop(vm), 0);
 }
 
+TEST(SquipUtil, readwrite_closure)
+{
+  squip::SquirrelVM sqvm;
+  HSQUIRRELVM vm = sqvm.get_vm();
+
+  std::ostringstream out;
+  sqvm.set_printfunc(
+    [&out](char const* msg){
+      out << msg;
+    },
+    [&out](char const* msg){
+      out << msg;
+    });
+
+  std::istringstream text("function doit() { print(\"HelloWorld\\n\") }; doit()");
+  squip::compile_script(vm, text, "<source>");
+  sq_pushroottable(vm);
+  ASSERT_TRUE(SQ_SUCCEEDED(sq_call(vm, 1, SQFalse, SQTrue)));
+
+  std::ostringstream os;
+  squip::write_closure(vm, os);
+  sq_poptop(vm);
+  ASSERT_EQ(sq_gettop(vm), 0);
+
+  std::istringstream in(os.str());
+  squip::read_closure(vm, in);
+
+  sq_pushroottable(vm);
+  ASSERT_TRUE(SQ_SUCCEEDED(sq_call(vm, 1, SQFalse, SQTrue)));
+  sq_poptop(vm);
+
+  ASSERT_EQ(out.str(), "HelloWorld\nHelloWorld\n");
+
+  ASSERT_EQ(sq_gettop(vm), 0);
+}
+
 /* EOF */

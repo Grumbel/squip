@@ -17,13 +17,15 @@
 
 #include "squip/util.hpp"
 
+#include <cstdarg>
+#include <cstdio>
 #include <cstring>
-#include <stdio.h>
+#include <fstream>
+
 #include <sqstdaux.h>
 #include <sqstdblob.h>
 #include <sqstdmath.h>
 #include <sqstdstring.h>
-#include <stdarg.h>
 
 #include <fmt/format.h>
 
@@ -349,6 +351,28 @@ SQInteger squirrel_read_char(SQUserPointer file)
   if (in->eof())
     return 0;
   return c;
+}
+
+void write_closure(HSQUIRRELVM vm, std::ostream& out)
+{
+  sq_writeclosure(vm, [](SQUserPointer userptr, SQUserPointer data, SQInteger len) -> SQInteger {
+    std::ofstream& out = *static_cast<std::ofstream*>(userptr);
+    if (!out.write(static_cast<char const*>(data), len)) {
+      return -1;
+    }
+    return len;
+  }, &out);
+}
+
+void read_closure(HSQUIRRELVM vm, std::istream& in)
+{
+  sq_readclosure(vm, [](SQUserPointer userptr, SQUserPointer data, SQInteger len) -> SQInteger {
+    std::ifstream& in = *static_cast<std::ifstream*>(userptr);
+    if (!in.read(static_cast<char*>(data), len)) {
+      return -1;
+    }
+    return len;
+  }, &in);
 }
 
 void compile_script(HSQUIRRELVM vm, std::istream& in, const std::string& sourcename)

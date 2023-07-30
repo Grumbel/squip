@@ -132,6 +132,7 @@ TableContext::store_c_function(std::string_view name, char const* typemask, SQFU
 {
   sq_pushstring(m_vm, name.data(), name.size());
   sq_newclosure(m_vm, func, 0);
+  sq_setnativeclosurename(m_vm, -1, std::string(name).c_str());
   sq_setparamscheck(m_vm, SQ_MATCHTYPEMASKSTRING, typemask);
 
   if(SQ_FAILED(sq_createslot(m_vm, m_idx))) {
@@ -144,6 +145,7 @@ TableContext::store_function(std::string_view name, const char* typemask, std::f
 {
   sq_pushstring(m_vm, name.data(), name.size());
   push_function(m_vm, std::move(func));
+  sq_setnativeclosurename(m_vm, -1, std::string(name).c_str());
   sq_setparamscheck(m_vm, SQ_MATCHTYPEMASKSTRING, typemask);
 
   if (SQ_FAILED(sq_createslot(m_vm, m_idx))) {

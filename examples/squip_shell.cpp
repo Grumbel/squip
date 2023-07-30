@@ -127,6 +127,15 @@ void register_functions(squip::TableContext& tbl)
     }
     return SQ_OK;
   });
+
+  tbl.store_c_function("pprint", nullptr, [](HSQUIRRELVM vm) -> SQInteger {
+    SQInteger const nargs = sq_gettop(vm);
+    for (int idx = 1; idx < nargs; ++idx) {
+      squip::repr(vm, idx + 1, std::cout, true);
+    }
+    std::cout << std::endl;
+    return SQ_OK;
+  });
 }
 
 } // namespace

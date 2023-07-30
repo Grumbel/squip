@@ -29,7 +29,7 @@
 namespace squip {
 
 /** Pick object from stack position idx and print it to a machine readable string */
-void repr(HSQUIRRELVM vm, SQInteger idx, std::ostream& os);
+void repr(HSQUIRRELVM vm, SQInteger idx, std::ostream& os, bool pretty = false, int indent = 0);
 
 /** Pick object from stack position idx and print it to a human readable string */
 void print(HSQUIRRELVM vm, SQInteger idx, std::ostream& os);

@@ -51,7 +51,7 @@ void print(HSQUIRRELVM vm, SQInteger idx, std::ostream& os)
   }
 }
 
-void repr(HSQUIRRELVM vm, SQInteger idx, std::ostream& os)
+void repr(HSQUIRRELVM vm, SQInteger idx, std::ostream& os, bool pretty, int indent)
 {
   // convert idx to positive, as sq_pushnull() would otherwise invalidate it
   if (idx < 0) {
@@ -116,23 +116,40 @@ void repr(HSQUIRRELVM vm, SQInteger idx, std::ostream& os)
 
     case OT_TABLE: {
       bool first = true;
-      os << "{";
+      if (pretty) {
+        os << "{\n";
+      } else {
+        os << "{";
+      }
       sq_pushnull(vm);  //null iterator
       while (SQ_SUCCEEDED(sq_next(vm, idx)))
       {
         if (!first) {
-          os << ", ";
+          if (pretty) {
+            os << ",\n";
+          } else {
+            os << ", ";
+          }
         }
         first = false;
 
-        repr(vm, -2, os);
+        if (pretty) {
+          os << std::string((indent + 1) * 2, ' ');
+        }
+
+        repr(vm, -2, os, pretty, indent + 1);
         os << ": ";
-        repr(vm, -1, os);
+        repr(vm, -1, os, pretty, indent + 1);
 
         sq_pop(vm, 2); //pops key and val before the nex iteration
       }
       sq_pop(vm, 1);
-      os << "}";
+      if (pretty) {
+        os << "\n" << std::string((indent) * 2, ' ');
+        os << "}";
+      } else {
+        os << "}";
+      }
       break;
     }
 
@@ -149,7 +166,7 @@ void repr(HSQUIRRELVM vm, SQInteger idx, std::ostream& os)
 
         //here -1 is the value and -2 is the key
         // we ignore the key, since that is just the index in an array
-        repr(vm, -1, os);
+        repr(vm, -1, os, pretty, indent + 1);
 
         sq_pop(vm, 2); //pops key and val before the nex iteration
       }

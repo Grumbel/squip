@@ -74,38 +74,6 @@ TableContext::store_function(std::string_view name, const char* typemask, std::f
   }
 }
 
-bool
-TableContext::read_bool(std::string_view name, bool& val)
-{
-  if (!has_key(name)) return false;
-  val = get<bool>(name);
-  return true;
-}
-
-bool
-TableContext::read_int(std::string_view name, int& val)
-{
-  if (!has_key(name)) return false;
-  val = get<int>(name);
-  return true;
-}
-
-bool
-TableContext::read_float(std::string_view name, float& val)
-{
-  if (!has_key(name)) return false;
-  val = get<float>(name);
-  return true;
-}
-
-bool
-TableContext::read_string(std::string_view name, std::string& val)
-{
-  if (!has_key(name)) return false;
-  val = get<std::string>(name);
-  return true;
-}
-
 void
 TableContext::get_entry(std::string_view name)
 {

@@ -80,10 +80,13 @@ public:
   void store_c_function(std::string_view name, char const* typemask, SQFUNCTION func);
   void store_function(std::string_view name, const char* typemask, std::function<SQInteger (HSQUIRRELVM)> func);
 
-  bool read_bool(std::string_view name, bool& val);
-  bool read_int(std::string_view name, int& val);
-  bool read_float(std::string_view name, float& val);
-  bool read_string(std::string_view name, std::string& val);
+  template<typename T>
+  bool read(std::string_view name, T& val)
+  {
+    if (!has_key(name)) return false;
+    val = get<T>(name);
+    return true;
+  }
 
   template<typename T>
   T get(std::string_view name)

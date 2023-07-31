@@ -26,10 +26,10 @@ TEST(SquipTableContext, store)
   float floatvalue = {};
   std::string stringvalue = {};
 
-  ASSERT_TRUE(root.read_bool("boolvalue", boolvalue));
-  ASSERT_TRUE(root.read_int("intvalue", intvalue));
-  ASSERT_TRUE(root.read_float("floatvalue", floatvalue));
-  ASSERT_TRUE(root.read_string("stringvalue", stringvalue));
+  ASSERT_TRUE(root.read<bool>("boolvalue", boolvalue));
+  ASSERT_TRUE(root.read<int>("intvalue", intvalue));
+  ASSERT_TRUE(root.read<float>("floatvalue", floatvalue));
+  ASSERT_TRUE(root.read<std::string>("stringvalue", stringvalue));
 
   ASSERT_EQ(boolvalue, true);
   ASSERT_EQ(intvalue, 45);

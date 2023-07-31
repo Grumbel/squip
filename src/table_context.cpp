@@ -49,56 +49,6 @@ TableContext::has_key(std::string_view name)
 }
 
 void
-TableContext::store_bool(std::string_view name, bool val)
-{
-  sq_pushstring(m_vm, name.data(), name.size());
-  sq_pushbool(m_vm, val ? SQTrue : SQFalse);
-  if (SQ_FAILED(sq_createslot(m_vm, m_idx))) {
-    throw SquirrelError::from_vm(m_vm, "failed to add float value to table");
-  }
-}
-
-void
-TableContext::store_int(std::string_view name, int val)
-{
-  sq_pushstring(m_vm, name.data(), name.size());
-  sq_pushinteger(m_vm, val);
-  if (SQ_FAILED(sq_createslot(m_vm, m_idx))) {
-    throw SquirrelError::from_vm(m_vm, "failed to add int value to table");
-  }
-}
-
-void
-TableContext::store_float(std::string_view name, float val)
-{
-  sq_pushstring(m_vm, name.data(), name.size());
-  sq_pushfloat(m_vm, val);
-  if (SQ_FAILED(sq_createslot(m_vm, m_idx))) {
-    throw SquirrelError::from_vm(m_vm, "failed to add float value to table");
-  }
-}
-
-void
-TableContext::store_string(std::string_view name, std::string_view val)
-{
-  sq_pushstring(m_vm, name.data(), name.size());
-  sq_pushstring(m_vm, val.data(), val.size());
-  if (SQ_FAILED(sq_createslot(m_vm, m_idx))) {
-    throw SquirrelError::from_vm(m_vm, "failed to add float value to table");
-  }
-}
-
-void
-TableContext::store_object(std::string_view name, HSQOBJECT val)
-{
-  sq_pushstring(m_vm, name.data(), name.size());
-  sq_pushobject(m_vm, val);
-  if (SQ_FAILED(sq_createslot(m_vm, m_idx))) {
-    throw SquirrelError::from_vm(m_vm, "failed to add object value to table");
-  }
-}
-
-void
 TableContext::store_c_function(std::string_view name, char const* typemask, SQFUNCTION func)
 {
   sq_pushstring(m_vm, name.data(), name.size());

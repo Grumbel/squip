@@ -10,10 +10,10 @@ TEST(SquipTableContext, store)
 
   squip::TableContext root = sqvm.push_roottable();
 
-  root.store_bool("boolvalue", true);
-  root.store_int("intvalue", 45);
-  root.store_float("floatvalue", 0.125);
-  root.store_string("stringvalue", "StringValue");
+  root.store("boolvalue", true);
+  root.store("intvalue", 45);
+  root.store("floatvalue", 0.125f);
+  root.store("stringvalue", "StringValue");
 
   ASSERT_EQ(root.get_bool("boolvalue"), true);
   ASSERT_EQ(root.get_int("intvalue"), 45);
@@ -57,10 +57,10 @@ TEST(SquipTableContext, store)
   {
     squip::TableContext tbl = root.create_table("newtable");
 
-    tbl.store_bool("tbl_boolvalue", true);
-    tbl.store_int("tbl_intvalue", 45);
-    tbl.store_float("tbl_floatvalue", 0.125);
-    tbl.store_string("tbl_stringvalue", "StringValue");
+    tbl.store("tbl_boolvalue", true);
+    tbl.store("tbl_intvalue", 45);
+    tbl.store("tbl_floatvalue", 0.125f);
+    tbl.store("tbl_stringvalue", "StringValue");
 
     ASSERT_EQ(tbl.get_bool("tbl_boolvalue"), true);
     ASSERT_EQ(tbl.get_int("tbl_intvalue"), 45);

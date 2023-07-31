@@ -25,6 +25,8 @@
 
 #include <squirrel.h>
 
+#include "squip/squirrel_error.hpp"
+
 namespace squip {
 
 /**
@@ -45,11 +47,15 @@ public:
 
   bool has_key(std::string_view name);
 
-  void store_bool(std::string_view name, bool val);
-  void store_int(std::string_view name, int val);
-  void store_float(std::string_view name, float val);
-  void store_string(std::string_view name, std::string_view val);
-  void store_object(std::string_view name, HSQOBJECT val);
+  template<typename T>
+  void store(std::string_view name, T val)
+  {
+    sq_pushstring(m_vm, name.data(), name.size());
+    push_value(m_vm, val);
+    if (SQ_FAILED(sq_createslot(m_vm, m_idx))) {
+      throw SquirrelError::from_vm(m_vm, "failed to store value in table");
+    }
+  }
 
   /* typemask:
      ‘o’ null

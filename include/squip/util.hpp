@@ -62,11 +62,14 @@ void push_value(HSQUIRRELVM vm, SQBool value);
 void push_value(HSQUIRRELVM vm, SQInteger value);
 void push_value(HSQUIRRELVM vm, SQFloat value);
 void push_value(HSQUIRRELVM vm, std::string_view value);
-void push_value(HSQUIRRELVM vm, int value);
 void push_value(HSQUIRRELVM vm, SQUserPointer userptr);
 void push_value(HSQUIRRELVM vm, Object const& obj);
 void push_value(HSQUIRRELVM vm, HSQOBJECT const& obj);
 void push_value(HSQUIRRELVM vm, Null const& null);
+
+void push_value(HSQUIRRELVM vm, char const* value);
+void push_value(HSQUIRRELVM vm, bool value);
+void push_value(HSQUIRRELVM vm, int value);
 
 void write_closure(HSQUIRRELVM vm, std::ostream& out);
 void read_closure(HSQUIRRELVM vm, std::istream& in);

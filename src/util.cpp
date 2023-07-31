@@ -487,6 +487,16 @@ push_value(HSQUIRRELVM vm, std::string_view value)
   sq_pushstring(vm, value.data(), value.size());
 }
 
+void push_value(HSQUIRRELVM vm, char const* value)
+{
+  sq_pushstring(vm, value, -1);
+}
+
+void push_value(HSQUIRRELVM vm, bool value)
+{
+  sq_pushbool(vm, value);
+}
+
 void push_value(HSQUIRRELVM vm, int value)
 {
   push_value(vm, static_cast<SQInteger>(value));

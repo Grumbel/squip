@@ -78,7 +78,7 @@ void read_closure(HSQUIRRELVM vm, std::istream& in);
 SQInteger absolute_index(HSQUIRRELVM vm, SQInteger idx);
 
 TableContext new_table(HSQUIRRELVM vm);
-ArrayContext new_array(HSQUIRRELVM vm, SQInteger size);
+ArrayContext new_array(HSQUIRRELVM vm, SQInteger size = 0);
 
 } // namespace squip
 

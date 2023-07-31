@@ -22,6 +22,8 @@
 
 #include <squirrel.h>
 
+#include "squip/stack_context.hpp"
+
 namespace squip {
 
 class SquirrelVM;
@@ -41,6 +43,8 @@ public:
   bool is_suspended();
 
   HSQUIRRELVM get_vm() { return m_vm; }
+
+  StackContext stack() { return StackContext(m_vm); }
 
 private:
   SquirrelVM* m_sqvm;

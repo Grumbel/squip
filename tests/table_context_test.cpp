@@ -8,7 +8,7 @@ TEST(SquipTableContext, store)
 {
   squip::SquirrelVM sqvm;
 
-  squip::TableContext root = sqvm.push_roottable();
+  squip::TableContext root = sqvm.stack().push_roottable();
 
   root.store("boolvalue", true);
   root.store("intvalue", 45);

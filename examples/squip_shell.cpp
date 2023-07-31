@@ -217,7 +217,7 @@ int main(int argc, char** argv) try
   }
 
   {
-    squip::TableContext root = sqvm.push_roottable();
+    squip::TableContext root = sqvm.stack().push_roottable();
     register_functions(root);
     sq_poptop(sqvm.get_vm());
   }

@@ -186,13 +186,6 @@ SquirrelVM::set_errorhandler(std::function<void (HSQUIRRELVM)> errorhandler)
   sq_seterrorhandler(m_vm);
 }
 
-TableContext
-SquirrelVM::push_roottable() const
-{
-  sq_pushroottable(m_vm);
-  return TableContext(m_vm, -1);
-}
-
 Thread
 SquirrelVM::create_thread()
 {

@@ -14,20 +14,28 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#ifndef HEADER_SQUIP_FWD_HPP
-#define HEADER_SQUIP_FWD_HPP
+#include "squip/stack_context.hpp"
+
+#include "squip/table_context.hpp"
 
 namespace squip {
 
-class ArrayContext;
-class Object;
-class SquirrelError;
-class SquirrelVM;
-class StackContext;
-class StackGuard;
-class TableContext;
-class Thread;
+StackContext::StackContext(HSQUIRRELVM vm) :
+  m_vm(vm)
+{
+}
+
+StackContext::~StackContext()
+{
+}
+
+TableContext
+StackContext::push_roottable()
+{
+  sq_pushroottable(m_vm);
+  return TableContext(m_vm, -1);
+}
 
 } // namespace squip
 
-#endif
+/* EOF */

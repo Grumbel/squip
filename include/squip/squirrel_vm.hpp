@@ -47,9 +47,9 @@ public:
                                 void (SQChar const*, SQChar const*, SQInteger, SQInteger)> compilererrorhandler);
   void set_errorhandler(std::function<void (HSQUIRRELVM)> errorhandler);
 
-  TableContext push_roottable() const;
-
   Thread create_thread();
+
+  StackContext stack() { return StackContext(m_vm); }
 
 private:
   static void my_printfunc(HSQUIRRELVM vm, const char* fmt, ...);

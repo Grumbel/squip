@@ -49,10 +49,10 @@ public:
   bool has_key(std::string_view name);
 
   template<typename T>
-  void store(std::string_view name, T val)
+  void store(std::string_view name, T&& val)
   {
     sq_pushstring(m_vm, name.data(), name.size());
-    push_value(m_vm, val);
+    push_value(m_vm, std::forward<T>(val));
     if (SQ_FAILED(sq_createslot(m_vm, m_idx))) {
       throw SquirrelError::from_vm(m_vm, "failed to store value in table");
     }

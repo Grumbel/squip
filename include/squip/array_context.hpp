@@ -34,15 +34,15 @@ public:
 
   void append();
   template<typename T>
-  void append(T value) {
-    push_value(m_vm, value);
+  void append(T&& value) {
+    push_value(m_vm, std::forward<T>(value));
     append();
   }
 
   void insert(SQInteger destpos);
   template<typename T>
-  void insert(SQInteger destpos, T value) {
-    push_value(m_vm, value);
+  void insert(SQInteger destpos, T&& value) {
+    push_value(m_vm, std::forward<T>(value));
     insert(destpos);
   }
 

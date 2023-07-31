@@ -23,8 +23,8 @@
 
 namespace squip {
 
-SquirrelError::SquirrelError(HSQUIRRELVM vm, std::string_view message) noexcept :
-  m_message()
+SquirrelError
+SquirrelError::from_vm(HSQUIRRELVM vm, std::string_view message)
 {
   SQInteger const oldtop = sq_gettop(vm);
 
@@ -41,16 +41,24 @@ SquirrelError::SquirrelError(HSQUIRRELVM vm, std::string_view message) noexcept 
   sq_getstring(vm, -1, &lasterr);
 
 end:
-  m_message = fmt::format("SquirrelError: {} ({})", message, lasterr);
+  std::string message_text = fmt::format("SquirrelError: {} ({})", message, lasterr);
 
   sq_settop(vm, oldtop);
+
+  return SquirrelError(std::move(message_text));
 }
 
-SquirrelError::~SquirrelError() throw()
-{}
+SquirrelError::SquirrelError(std::string message) noexcept :
+  m_message(std::move(message))
+{
+}
+
+SquirrelError::~SquirrelError() noexcept
+{
+}
 
 char const*
-SquirrelError::what() const throw()
+SquirrelError::what() const noexcept
 {
   return m_message.c_str();
 }

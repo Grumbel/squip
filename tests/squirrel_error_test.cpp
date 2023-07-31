@@ -10,11 +10,11 @@ TEST(SquipSquirrelError, error)
   std::istringstream is;
 
   EXPECT_THROW({
-      throw squip::SquirrelError(vm, "test error");
+      throw squip::SquirrelError::from_vm(vm, "test error");
     }, squip::SquirrelError);
 
   try {
-    throw squip::SquirrelError(vm, "TestError");
+    throw squip::SquirrelError::from_vm(vm, "TestError");
   } catch(squip::SquirrelError const& err) {
     EXPECT_STREQ(err.what(), "SquirrelError: TestError (null)");
   }

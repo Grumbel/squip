@@ -248,13 +248,13 @@ int main(int argc, char** argv) try
       sq_pushstring(lvm, "x", -1);
       sq_pushinteger(lvm, 111);
       if (SQ_FAILED(sq_set(lvm, 1))) {
-        throw squip::SquirrelError(lvm, "failed to set");
+        throw squip::SquirrelError::from_vm(lvm, "failed to set");
       }
 
       // print
       sq_pushstring(lvm, "print", -1);
       if (SQ_FAILED(sq_get(lvm, 1))) {
-        throw squip::SquirrelError(lvm, "failed to get print()");
+        throw squip::SquirrelError::from_vm(lvm, "failed to get print()");
       }
       sq_push(lvm, 1);
       sq_call(lvm, 1, SQFalse, SQFalse);
@@ -302,16 +302,16 @@ int main(int argc, char** argv) try
       HSQMEMBERHANDLE x_memberhandle;
       sq_pushstring(vm, "x", -1);
       if (SQ_FAILED(sq_getmemberhandle(vm, 2, &x_memberhandle))) {
-        throw squip::SquirrelError(vm, "failed to get member handle");
+        throw squip::SquirrelError::from_vm(vm, "failed to get member handle");
       }
 
       SQInteger x;
       if (SQ_FAILED(sq_getbyhandle(vm, 2, &x_memberhandle))) {
-        throw squip::SquirrelError(vm, "failed to get by member handle");
+        throw squip::SquirrelError::from_vm(vm, "failed to get by member handle");
       }
 
       if (SQ_FAILED(sq_getinteger(vm, -1, &x))) {
-        throw squip::SquirrelError(vm, "failed to get integer");
+        throw squip::SquirrelError::from_vm(vm, "failed to get integer");
       }
 
       fmt::print("x from member handle: {}\n", x);

@@ -34,7 +34,7 @@ SQBool unpack<SQBool>(HSQUIRRELVM vm, SQInteger idx)
 {
   SQBool value;
   if (SQ_FAILED(sq_getbool(vm, idx, &value))) {
-    throw SquirrelError(vm, "failed to retrieve bool");
+    throw SquirrelError::from_vm(vm, "failed to retrieve bool");
   }
   return value;
 }
@@ -44,7 +44,7 @@ SQInteger unpack<SQInteger>(HSQUIRRELVM vm, SQInteger idx)
 {
   SQInteger value;
   if (SQ_FAILED(sq_getinteger(vm, idx, &value))) {
-    throw SquirrelError(vm, "failed to retrieve integer");
+    throw SquirrelError::from_vm(vm, "failed to retrieve integer");
   }
   return value;
 }
@@ -54,7 +54,7 @@ SQFloat unpack<SQFloat>(HSQUIRRELVM vm, SQInteger idx)
 {
   SQFloat value;
   if (SQ_FAILED(sq_getfloat(vm, idx, &value))) {
-    throw SquirrelError(vm, "failed to retrieve float");
+    throw SquirrelError::from_vm(vm, "failed to retrieve float");
   }
   return value;
 }
@@ -64,7 +64,7 @@ SQChar const* unpack<SQChar const*>(HSQUIRRELVM vm, SQInteger idx)
 {
   SQChar const* value;
   if (SQ_FAILED(sq_getstring(vm, idx, &value))) {
-    throw SquirrelError(vm, "failed to retrieve string");
+    throw SquirrelError::from_vm(vm, "failed to retrieve string");
   }
   return value;
 }

@@ -31,7 +31,7 @@ Object::Object(HSQUIRRELVM vm, SQInteger idx) :
 {
   sq_resetobject(&m_handle);
   if (SQ_FAILED(sq_getstackobj(vm, idx, &m_handle))) {
-    throw SquirrelError(m_vm, "failed to get object from stack");
+    throw SquirrelError::from_vm(m_vm, "failed to get object from stack");
   }
 
   sq_addref(m_vm, &m_handle);

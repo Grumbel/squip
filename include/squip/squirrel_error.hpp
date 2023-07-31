@@ -33,7 +33,10 @@ namespace squip {
 class SquirrelError final : public std::exception
 {
 public:
-  SquirrelError(HSQUIRRELVM vm, std::string_view message) noexcept;
+  static SquirrelError from_vm(HSQUIRRELVM vm, std::string_view message);
+
+public:
+  SquirrelError(std::string message) noexcept;
   SquirrelError(SquirrelError const&) = default;
   SquirrelError& operator=(SquirrelError const&) = default;
   ~SquirrelError() noexcept override;

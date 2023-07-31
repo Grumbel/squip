@@ -15,10 +15,11 @@ TEST(SquipTableContext, store)
   root.store("floatvalue", 0.125f);
   root.store("stringvalue", "StringValue");
 
-  ASSERT_EQ(root.get_bool("boolvalue"), true);
-  ASSERT_EQ(root.get_int("intvalue"), 45);
-  ASSERT_EQ(root.get_float("floatvalue"), 0.125);
-  ASSERT_EQ(root.get_string("stringvalue"), "StringValue");
+  ASSERT_EQ(root.get<bool>("boolvalue"), true);
+  ASSERT_EQ(root.get<int>("intvalue"), 45);
+  ASSERT_EQ(root.get<float>("floatvalue"), 0.125);
+  ASSERT_EQ(root.get<std::string>("stringvalue"), "StringValue");
+  ASSERT_STREQ(root.get<SQChar const*>("stringvalue"), "StringValue");
 
   bool boolvalue = {};
   int intvalue = {};
@@ -62,10 +63,11 @@ TEST(SquipTableContext, store)
     tbl.store("tbl_floatvalue", 0.125f);
     tbl.store("tbl_stringvalue", "StringValue");
 
-    ASSERT_EQ(tbl.get_bool("tbl_boolvalue"), true);
-    ASSERT_EQ(tbl.get_int("tbl_intvalue"), 45);
-    ASSERT_EQ(tbl.get_float("tbl_floatvalue"), 0.125);
-    ASSERT_EQ(tbl.get_string("tbl_stringvalue"), "StringValue");
+    ASSERT_EQ(tbl.get<bool>("tbl_boolvalue"), true);
+    ASSERT_EQ(tbl.get<int>("tbl_intvalue"), 45);
+    ASSERT_EQ(tbl.get<float>("tbl_floatvalue"), 0.125);
+    ASSERT_EQ(tbl.get<std::string>("tbl_stringvalue"), "StringValue");
+    ASSERT_STREQ(tbl.get<SQChar const*>("tbl_stringvalue"), "StringValue");
 
     sq_poptop(sqvm.get_vm());
   }

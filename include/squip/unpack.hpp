@@ -74,6 +74,32 @@ SQChar const* unpack<SQChar const*>(HSQUIRRELVM vm, SQInteger idx)
   return value;
 }
 
+template<>
+inline
+bool unpack<bool>(HSQUIRRELVM vm, SQInteger idx)
+{
+  return unpack<SQBool>(vm, idx) != SQFalse;
+}
+
+template<>
+inline
+int unpack<int>(HSQUIRRELVM vm, SQInteger idx)
+{
+  return static_cast<int>(unpack<SQInteger>(vm, idx));
+}
+
+template<>
+inline
+std::string unpack<std::string>(HSQUIRRELVM vm, SQInteger idx)
+{
+  SQChar const* value;
+  SQInteger size;
+  if (SQ_FAILED(sq_getstringandsize(vm, idx, &value, &size))) {
+    throw SquirrelError::from_vm(vm, "failed to retrieve string");
+  }
+  return std::string(value, size);
+}
+
 template<typename T>
 inline
 std::vector<T> unpack_array(HSQUIRRELVM vm, SQInteger idx)

@@ -78,7 +78,7 @@ bool
 TableContext::read_bool(std::string_view name, bool& val)
 {
   if (!has_key(name)) return false;
-  val = get_bool(name);
+  val = get<bool>(name);
   return true;
 }
 
@@ -86,7 +86,7 @@ bool
 TableContext::read_int(std::string_view name, int& val)
 {
   if (!has_key(name)) return false;
-  val = get_int(name);
+  val = get<int>(name);
   return true;
 }
 
@@ -94,7 +94,7 @@ bool
 TableContext::read_float(std::string_view name, float& val)
 {
   if (!has_key(name)) return false;
-  val = get_float(name);
+  val = get<float>(name);
   return true;
 }
 
@@ -102,64 +102,8 @@ bool
 TableContext::read_string(std::string_view name, std::string& val)
 {
   if (!has_key(name)) return false;
-  val = get_string(name);
+  val = get<std::string>(name);
   return true;
-}
-
-bool
-TableContext::get_bool(std::string_view name)
-{
-  get_entry(name);
-
-  SQBool result;
-  if (SQ_FAILED(sq_getbool(m_vm, -1, &result))) {
-    throw SquirrelError::from_vm(m_vm, fmt::format("failed to get bool value for '{}' from table", name));
-  }
-  sq_pop(m_vm, 1);
-
-  return result == SQTrue;
-}
-
-int
-TableContext::get_int(std::string_view name)
-{
-  get_entry(name);
-
-  SQInteger result;
-  if (SQ_FAILED(sq_getinteger(m_vm, -1, &result))) {
-    throw SquirrelError::from_vm(m_vm, fmt::format("failed to get int value for '{}' from table", name));
-  }
-  sq_pop(m_vm, 1);
-
-  return static_cast<int>(result);
-}
-
-float
-TableContext::get_float(std::string_view name)
-{
-  get_entry(name);
-
-  float result;
-  if (SQ_FAILED(sq_getfloat(m_vm, -1, &result))) {
-    throw SquirrelError::from_vm(m_vm, fmt::format("failed to get float value for '{}' from table", name));
-  }
-  sq_pop(m_vm, 1);
-
-  return result;
-}
-
-std::string
-TableContext::get_string(std::string_view name)
-{
-  get_entry(name);
-
-  char const* result;
-  if (SQ_FAILED(sq_getstring(m_vm, -1, &result))) {
-    throw SquirrelError::from_vm(m_vm, fmt::format("failed to get string value for '{}' from table", name));
-  }
-  sq_pop(m_vm, 1);
-
-  return std::string(result);
 }
 
 void

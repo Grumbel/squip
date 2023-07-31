@@ -26,6 +26,7 @@
 #include <squirrel.h>
 
 #include "squip/squirrel_error.hpp"
+#include "squip/unpack.hpp"
 
 namespace squip {
 
@@ -84,10 +85,16 @@ public:
   bool read_float(std::string_view name, float& val);
   bool read_string(std::string_view name, std::string& val);
 
-  bool get_bool(std::string_view name);
-  int get_int(std::string_view name);
-  float get_float(std::string_view name);
-  std::string get_string(std::string_view name);
+  template<typename T>
+  T get(std::string_view name)
+  {
+    get_entry(name);
+
+    T result = squip::unpack<T>(m_vm, -1);
+    sq_pop(m_vm, 1);
+
+    return result;
+  }
 
   void get_entry(std::string_view name);
   void delete_entry(std::string_view name);

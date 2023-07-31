@@ -47,7 +47,7 @@ public:
                                 void (SQChar const*, SQChar const*, SQInteger, SQInteger)> compilererrorhandler);
   void set_errorhandler(std::function<void (HSQUIRRELVM)> errorhandler);
 
-  TableContext get_roottable() const;
+  TableContext push_roottable() const;
 
   Thread create_thread();
 

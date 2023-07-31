@@ -35,35 +35,6 @@ TableContext::TableContext(HSQUIRRELVM vm, SQInteger idx) :
 
 TableContext::~TableContext()
 {
-  if (m_vm) {
-    assert(sq_gettop(m_vm) == m_idx);
-    sq_pop(m_vm, 1);
-  }
-}
-
-TableContext::TableContext(TableContext&& other)
-  : m_vm(std::move(other.m_vm))
-{
-  other.m_vm = nullptr;
-}
-
-TableContext&
-TableContext::operator=(TableContext&& other)
-{
-  if (m_vm != nullptr) { end(); }
-
-  m_vm = std::move(other.m_vm);
-  other.m_vm = nullptr;
-
-  return *this;
-}
-
-void
-TableContext::end()
-{
-  assert(m_vm != nullptr);
-  sq_pop(m_vm, 1);
-  m_vm = nullptr;
 }
 
 bool

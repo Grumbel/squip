@@ -43,12 +43,6 @@ public:
   TableContext(HSQUIRRELVM vm, SQInteger idx);
   ~TableContext();
 
-  TableContext(TableContext&& other);
-  TableContext& operator=(TableContext&& other);
-
-  /** pop the table from the stack */
-  void end();
-
   bool has_key(std::string_view name);
 
   void store_bool(std::string_view name, bool val);

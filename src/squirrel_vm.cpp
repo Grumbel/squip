@@ -187,7 +187,7 @@ SquirrelVM::set_errorhandler(std::function<void (HSQUIRRELVM)> errorhandler)
 }
 
 TableContext
-SquirrelVM::get_roottable() const
+SquirrelVM::push_roottable() const
 {
   sq_pushroottable(m_vm);
   return TableContext(m_vm, -1);

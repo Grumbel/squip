@@ -91,9 +91,7 @@ void load_squirrel_table(HSQUIRRELVM vm, SQInteger table_idx, const ReaderMappin
 
 void save_squirrel_table(HSQUIRRELVM vm, SQInteger table_idx, Writer& writer)
 {
-  // offset because of sq_pushnull
-  if (table_idx < 0)
-    table_idx -= 1;
+  table_idx = absolute_index(table_idx);
 
   //iterator table
   sq_pushnull(vm);

@@ -23,6 +23,7 @@
 #include <squirrel.h>
 
 #include "squip/squirrel_error.hpp"
+#include "squip/util.hpp"
 
 namespace squip {
 
@@ -30,6 +31,7 @@ template<typename T>
 T unpack(HSQUIRRELVM vm, SQInteger idx) = delete;
 
 template<>
+inline
 SQBool unpack<SQBool>(HSQUIRRELVM vm, SQInteger idx)
 {
   SQBool value;
@@ -40,6 +42,7 @@ SQBool unpack<SQBool>(HSQUIRRELVM vm, SQInteger idx)
 }
 
 template<>
+inline
 SQInteger unpack<SQInteger>(HSQUIRRELVM vm, SQInteger idx)
 {
   SQInteger value;
@@ -50,6 +53,7 @@ SQInteger unpack<SQInteger>(HSQUIRRELVM vm, SQInteger idx)
 }
 
 template<>
+inline
 SQFloat unpack<SQFloat>(HSQUIRRELVM vm, SQInteger idx)
 {
   SQFloat value;
@@ -60,6 +64,7 @@ SQFloat unpack<SQFloat>(HSQUIRRELVM vm, SQInteger idx)
 }
 
 template<>
+inline
 SQChar const* unpack<SQChar const*>(HSQUIRRELVM vm, SQInteger idx)
 {
   SQChar const* value;
@@ -70,10 +75,12 @@ SQChar const* unpack<SQChar const*>(HSQUIRRELVM vm, SQInteger idx)
 }
 
 template<typename T>
+inline
 std::vector<T> unpack_array(HSQUIRRELVM vm, SQInteger idx)
 {
-  std::vector<T> value;
+  idx = absolute_index(vm, idx);
 
+  std::vector<T> value;
   sq_pushnull(vm);  // iterator
   while (SQ_SUCCEEDED(sq_next(vm, idx)))
   {
@@ -89,30 +96,35 @@ std::vector<T> unpack_array(HSQUIRRELVM vm, SQInteger idx)
 }
 
 template<>
+inline
 std::vector<SQBool> unpack<std::vector<SQBool>>(HSQUIRRELVM vm, SQInteger idx)
 {
   return unpack_array<SQBool>(vm, idx);
 }
 
 template<>
+inline
 std::vector<SQInteger> unpack<std::vector<SQInteger>>(HSQUIRRELVM vm, SQInteger idx)
 {
   return unpack_array<SQInteger>(vm, idx);
 }
 
 template<>
+inline
 std::vector<SQFloat> unpack<std::vector<SQFloat>>(HSQUIRRELVM vm, SQInteger idx)
 {
   return unpack_array<SQFloat>(vm, idx);
 }
 
 template<>
+inline
 std::vector<SQChar const*> unpack<std::vector<SQChar const*>>(HSQUIRRELVM vm, SQInteger idx)
 {
   return unpack_array<SQChar const*>(vm, idx);
 }
 
 template<typename T, typename... Args>
+inline
 std::tuple<T, Args...> unpack_args(HSQUIRRELVM vm, SQInteger idx = 2)
 {
   if constexpr (sizeof...(Args) == 0) {

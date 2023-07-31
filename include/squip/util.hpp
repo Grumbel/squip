@@ -24,9 +24,13 @@
 #include <sstream>
 #include <vector>
 
+#include "squip/fwd.hpp"
 #include "squip/squirrel_error.hpp"
 
 namespace squip {
+
+/** Dummy value to allow sq_pushnull() via overloading */
+struct Null {};
 
 /** Pick object from stack position idx and print it to a machine readable string */
 void repr(HSQUIRRELVM vm, SQInteger idx, std::ostream& os, bool pretty = false, int indent = 0);
@@ -53,6 +57,16 @@ void compile_and_run(HSQUIRRELVM vm, std::istream& in,
                      const std::string& sourcename);
 
 void push_function(HSQUIRRELVM vm, std::function<SQInteger (HSQUIRRELVM)> func);
+
+void push_value(HSQUIRRELVM vm, SQBool value);
+void push_value(HSQUIRRELVM vm, SQInteger value);
+void push_value(HSQUIRRELVM vm, SQFloat value);
+void push_value(HSQUIRRELVM vm, std::string_view value);
+void push_value(HSQUIRRELVM vm, int value);
+void push_value(HSQUIRRELVM vm, SQUserPointer userptr);
+void push_value(HSQUIRRELVM vm, Object const& obj);
+void push_value(HSQUIRRELVM vm, HSQOBJECT const& obj);
+void push_value(HSQUIRRELVM vm, Null const& null);
 
 void write_closure(HSQUIRRELVM vm, std::ostream& out);
 void read_closure(HSQUIRRELVM vm, std::istream& in);

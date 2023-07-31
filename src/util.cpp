@@ -29,6 +29,9 @@
 
 #include <fmt/format.h>
 
+#include "squip/object.hpp"
+#include "squip/table_context.hpp"
+
 namespace squip {
 
 void print(HSQUIRRELVM vm, SQInteger idx, std::ostream& os)
@@ -457,6 +460,55 @@ SQInteger absolute_index(HSQUIRRELVM vm, SQInteger idx)
   } else {
     return sq_gettop(vm) + idx + 1;
   }
+}
+
+void
+push_value(HSQUIRRELVM vm, SQBool value)
+{
+  sq_pushbool(vm, value);
+}
+
+void
+push_value(HSQUIRRELVM vm, SQInteger value)
+{
+  sq_pushinteger(vm, value);
+}
+
+void
+push_value(HSQUIRRELVM vm, SQFloat value)
+{
+  sq_pushfloat(vm, value);
+}
+
+void
+push_value(HSQUIRRELVM vm, std::string_view value)
+{
+  sq_pushstring(vm, value.data(), value.size());
+}
+
+void push_value(HSQUIRRELVM vm, int value)
+{
+  push_value(vm, static_cast<SQInteger>(value));
+}
+
+void push_value(HSQUIRRELVM vm, SQUserPointer userptr)
+{
+  sq_pushuserpointer(vm, userptr);
+}
+
+void push_value(HSQUIRRELVM vm, Object const& obj)
+{
+  sq_pushobject(vm, obj.get_handle());
+}
+
+void push_value(HSQUIRRELVM vm, HSQOBJECT const& obj)
+{
+  sq_pushobject(vm, obj);
+}
+
+void push_value(HSQUIRRELVM vm, Null const& null)
+{
+  sq_pushnull(vm);
 }
 
 } // namespace squip

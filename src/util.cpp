@@ -29,6 +29,7 @@
 
 #include <fmt/format.h>
 
+#include "squip/array_context.hpp"
 #include "squip/object.hpp"
 #include "squip/table_context.hpp"
 

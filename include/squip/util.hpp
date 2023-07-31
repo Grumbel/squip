@@ -74,6 +74,9 @@ void read_closure(HSQUIRRELVM vm, std::istream& in);
 /** Convert the given index into a positive index (e.g. -1 -> sq_gettop()) */
 SQInteger absolute_index(HSQUIRRELVM vm, SQInteger idx);
 
+TableContext new_table(HSQUIRRELVM vm);
+ArrayContext new_array(HSQUIRRELVM vm, SQInteger size);
+
 } // namespace squip
 
 #endif

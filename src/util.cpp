@@ -512,6 +512,18 @@ void push_value(HSQUIRRELVM vm, Null const& null)
   sq_pushnull(vm);
 }
 
+TableContext new_table(HSQUIRRELVM vm)
+{
+  sq_newtable(vm);
+  return TableContext(vm, -1);
+}
+
+ArrayContext new_array(HSQUIRRELVM vm, SQInteger size)
+{
+  sq_newarray(vm, size);
+  return ArrayContext(vm, -1);
+}
+
 } // namespace squip
 
 /* EOF */

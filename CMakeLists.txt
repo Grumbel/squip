@@ -17,7 +17,7 @@
 #    misrepresented as being the original software.
 # 3. This notice may not be removed or altered from any source distribution.
 
-cmake_minimum_required(VERSION 3.6)
+cmake_minimum_required(VERSION 4.0)
 project(squip VERSION 0.0.0)
 
 include(mk/cmake/TinyCMMC.cmake)
